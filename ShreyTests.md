@@ -2,6 +2,12 @@
 
 This this test case shows how it would work if everything is submitted properly
 
+`test_user = User(
+     email='test_frontend@test.com',
+     name='test_frontend',
+     password=generate_password_hash('test_frontend')
+ )`
+
 `test_ticket = Ticket(
     owner='test_frontend@test.com',
     name='test_ticket_yo',
@@ -33,6 +39,12 @@ This this test case shows how it would work if everything is submitted properly
 
 The name of the ticket is no longer than 60 characters
 
+`test_user = User(
+     email='test_frontend@test.com',
+     name='test_frontend',
+     password=generate_password_hash('test_frontend')
+ )`
+
 `test_ticket = Ticket(
     owner='test_frontend@test.com',
     name=‘According to all known laws of aviation, there is no way a bee should be able to fly.’,
@@ -62,6 +74,12 @@ The name of the ticket is no longer than 60 characters
 
 **R6.3 - number too high**
 The quantity of the tickets has to be more than 0, and less than or equal to 100.
+
+`test_user = User(
+     email='test_frontend@test.com',
+     name='test_frontend',
+     password=generate_password_hash('test_frontend')
+ )`
 
 `test_ticket = Ticket(
     owner='test_frontend@test.com',
@@ -93,7 +111,13 @@ The quantity of the tickets has to be more than 0, and less than or equal to 100
 
 **R6.3 - number too low**
 
-`test_ticket1 = Ticket(
+`test_user = User(
+     email='test_frontend@test.com',
+     name='test_frontend',
+     password=generate_password_hash('test_frontend')
+ )`
+
+`test_ticket = Ticket(
     owner='test_frontend@test.com',
     name='test_ticket_yo',
     quantity=-1337,
@@ -126,6 +150,12 @@ The quantity of the tickets has to be more than 0, and less than or equal to 100
 
 The ticket name exists in the database and the quantity is more than the quantity requested to buy
 
+`test_user = User(
+     email='test_frontend@test.com',
+     name='test_frontend',
+     password=generate_password_hash('test_frontend')
+ )`
+
 `test_ticket = Ticket(
     owner='test_frontend@test.com',
     name='test_ticket_yo',
@@ -156,6 +186,12 @@ The ticket name exists in the database and the quantity is more than the quantit
 * open /logout (clean up)
 
 **R6.4 - Quantity remaining is less than what is available in stock**
+
+`test_user = User(
+     email='test_frontend@test.com',
+     name='test_frontend',
+     password=generate_password_hash('test_frontend')
+ )`
 
 `test_ticket = Ticket(
     owner='test_frontend@test.com',
@@ -188,8 +224,14 @@ The ticket name exists in the database and the quantity is more than the quantit
 
 The user has more balance than the ticket price * quantity + service fee (35%) + tax (5%)
 
-`The ticket name exists in the database and the quantity is more than the quantity requested to buy
-test_ticket1 = Ticket(
+`test_user = User(
+     email='test_frontend@test.com',
+     name='test_frontend',
+     password=generate_password_hash('test_frontend')
+ )`
+
+`
+test_ticket = Ticket(
     owner='test_frontend@test.com',
     name='test_ticket_yo',
     quantity=10,
