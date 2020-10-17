@@ -24,6 +24,7 @@
 | The ticket name exists in the database and the quantity is more than the quantity requested to buy                                                    | R6.4.0       | Check that the ticket name exists in the database and what would happen if it does not                |    
 | cont.                                                                                                                                               | R6.4.1       | Check that the quantity in stock is more than what the person requested                |
 | The user has more balance than the ticket price * quantity + service fee (35%) + tax (5%)                                                           | R6.5.0       | Check to ensure the user has enough balance to make the purchase                |
+| [GET, POST]                        |       |                 |
 | Logout will invalid the current session and redirect to the login page. After logout, the user shouldn't be able to access restricted pages.          | R7.0.0       | Ensure that once someone logs out, they wont be able to access restricted pages. This is a security measure so that no one can steal information after someone has supposedly logged out.|
 | For any other requests /login, /register, /, /login, /buy, /sell, the system should return a 404 error                                               | R8           | Check that 404 errors are handled correctly                                                           |
 
