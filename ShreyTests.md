@@ -1,6 +1,6 @@
-**R6.1 BUY POSITIVE**
+**R6 POSITIVE TEST CASE AND IT WORKS**
 
-This this test case shows how it would work if everything is submitted properly
+This test case shows how it would work if everything is submitted properly
 
 `test_user = User(
      email='test_frontend@test.com',
@@ -34,8 +34,120 @@ This this test case shows how it would work if everything is submitted properly
 * validate that the #buy_message element shows successful
 * open /logout (clean up)
 
+**R6.1.1 Buy - Space Character at the beginning of the name**
 
-**R6.2 BUY BUT NAME > 60 CHARACTERS**
+`test_user = User(
+     email='test_frontend@test.com',
+     name='test_frontend',
+     password=generate_password_hash('test_frontend')
+ )`
+
+`test_ticket = Ticket(
+    owner='test_frontend@test.com',
+    name=‘ test_ticket_yo’,
+    quantity=10,
+    price=10,
+    date='20200901'
+)`
+
+**Mocking**
+* [no mocking necessary]
+
+**Actions**
+
+* open /logout (to invalidate any logged-in sessions that may exist)
+* open /login
+* enter test_user's email into element #email
+* enter test_user's password into element #password
+* click element input[type="submit"]
+* open /
+* enter test_ticket's name into element #buy_name
+* enter test_ticket's quantity into element #buy_quantity
+* click element #buy_submit
+* validate that the #buy_message element shows failure
+* validate that the #buy_message element provides an explanation that the reason it failed was because a space was used in the beginning
+* open /
+* validate current page is user home page
+* open /logout (clean up)
+
+**R6.1.2 Buy - Space Character at the end of the name**
+
+`test_user = User(
+     email='test_frontend@test.com',
+     name='test_frontend',
+     password=generate_password_hash('test_frontend')
+ )`
+
+`test_ticket = Ticket(
+    owner='test_frontend@test.com',
+    name=‘test_ticket_yo ’,
+    quantity=10,
+    price=10,
+    date='20200901'
+)`
+ 
+
+**Mocking**
+* [no mocking necessary]
+
+**Actions**
+
+* open /logout (to invalidate any logged-in sessions that may exist)
+* open /login
+* enter test_user's email into element #email
+* enter test_user's password into element #password
+* click element input[type="submit"]
+* open /
+* enter test_ticket's name into element #buy_name
+* enter test_ticket's quantity into element #buy_quantity
+* click element #buy_submit
+* validate that the #buy_message element shows failure
+* validate that the #buy_message element provides an explanation that the reason it failed was because lack of proper alphanumeric usage in the name
+* open /
+* validate current page is user home page
+* open /logout (clean up)
+
+
+**R6.1.3 Buy - Alpha Numeric** 
+The name of the ticket has to be alpha-numeric only 
+
+`test_user = User(
+     email='test_frontend@test.com',
+     name='test_frontend',
+     password=generate_password_hash('test_frontend')
+ )`
+
+`test_ticket = Ticket(
+    owner='test_frontend@test.com',
+    name=‘😳test_ticket_yo',
+    quantity=10,
+    price=10,
+    date='20200901'
+)`
+
+**Mocking**
+* [no mocking necessary]
+
+**Actions**
+
+* open /logout (to invalidate any logged-in sessions that may exist)
+* open /login
+* enter test_user's email into element #email
+* enter test_user's password into element #password
+* click element input[type="submit"]
+* open /
+* enter test_ticket's name into element #buy_name
+* enter test_ticket's quantity into element #buy_quantity
+* click element #buy_submit
+* validate that the #buy_message element shows failure
+* validate that the #buy_message element provides an explanation that the reason it failed was because lack of proper alphanumeric usage in the name
+* open /
+* validate current page is user home page
+* open /logout (clean up)
+
+
+
+**R6.2.0 BUY BUT NAME > 60 CHARACTERS**
 
 The name of the ticket is no longer than 60 characters
 
@@ -72,7 +184,7 @@ The name of the ticket is no longer than 60 characters
 * validate current page is user home page
 * open /logout (clean up)
 
-**R6.3 - number too high**
+**R6.3.1 - number too high**
 The quantity of the tickets has to be more than 0, and less than or equal to 100.
 
 `test_user = User(
@@ -109,7 +221,7 @@ The quantity of the tickets has to be more than 0, and less than or equal to 100
 * validate current page is user home page
 * open /logout (clean up)
 
-**R6.3 - number too low**
+**R6.3.2 - number too low**
 
 `test_user = User(
      email='test_frontend@test.com',
@@ -146,7 +258,7 @@ The quantity of the tickets has to be more than 0, and less than or equal to 100
 * open /logout (clean up)
 
 
-**R6.4 - The ticket name does not exist in the database**
+**R6.4.1 - The ticket name does not exist in the database**
 
 The ticket name exists in the database and the quantity is more than the quantity requested to buy
 
@@ -185,7 +297,7 @@ The ticket name exists in the database and the quantity is more than the quantit
 * validate current page is user home page
 * open /logout (clean up)
 
-**R6.4 - Quantity remaining is less than what is available in stock**
+**R6.4.2 - Quantity remaining is less than what is available in stock**
 
 `test_user = User(
      email='test_frontend@test.com',
@@ -220,7 +332,7 @@ The ticket name exists in the database and the quantity is more than the quantit
 * open /logout (clean up)
 
 
-**R6.5 User has more balance than the ticket price**
+**R6.5.1 User has more balance than the ticket price**
 
 The user has more balance than the ticket price * quantity + service fee (35%) + tax (5%)
 
@@ -263,7 +375,7 @@ test_ticket = Ticket(
 * open /logout (clean up)
 
 
-**R7**
+**R7.1**
 Logout will invalid the current session and redirect to the login page. After logout, the user shouldn't be able to access restricted pages.
 
 `test_user = User(
