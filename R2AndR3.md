@@ -158,3 +158,171 @@ Actions:
 -validate that current page is /
 -validate that test_user balance is 5000.
 -open /logout
+
+## Test Cases For R3: ##
+
+### Test Case R3.1.1 - If the user is not logged in, redirect to login page ###
+
+Actions:
+-open /logout
+-open /
+-validate that the current page is now redirected to /login
+
+### Test Case R3.2.1 - This page shows a header 'Hi {}'.format(user.name) ###
+
+Mocking:
+-Mock backend.get_user to return test_user instance
+
+Actions:
+-open /logout
+-open /login
+-enter test_user's email into element #email
+-enter test_user's password into element #password
+-click element input[type="login"]
+-validate current page is /
+-validate page shows element #welcome-message that says: 'Hi {}'.format(user.name)
+
+### Test Case R3.3.1 - This page shows user balance. ###
+
+Mocking:
+-Mock backend.get_user to return test_user instance
+
+Actions:
+-open /logout
+-open /login
+-enter test_user's email into element #email
+-enter test_user's password into element #password
+-click element input[type="login"]
+-validate current page is /
+-validate page shows element #balance that displays the value of test_user's balance.
+
+### Test Case R3.4.1 - This page shows a logout link, pointing to /logout ###
+
+Mocking:
+-Mock backend.get_user to return test_user instance
+
+Actions:
+-open /logout
+-open /login
+-enter test_user's email into element #email
+-enter test_user's password into element #password
+-click element input[type="login"]
+-validate current page is /
+-click element input[type="logout"]
+-validate current page is /logout
+
+### Test Case R3.5.1 - This page lists all available tickets. Information including the quantity of each ticket, the owner's email, and the price, for tickets that are not expired. ###
+
+Mocking:
+-Mock backend.get_user to return test_user intstance
+-Mock backend.get_all_tickets to return test_tickets instance
+
+Actions:
+-open /logout
+-open /login
+-enter test_user's email into element #email
+-enter test_user's password into element #password
+-click element input[type="login"]
+-verify all tickets from test_tickets instance are listed
+-validate that the quantity, owner's email, and the price are exactly as listed in test_tickets
+-validate all tickets are not expired
+
+### Test Case R3.6.1 - This page lists all available tickets. Information including the quantity of each ticket, the owner's email, and the price, for tickets that are not expired. ###
+
+Mocking:
+-Mock backend.get_user to return test_user intstance
+
+Action:
+-open /logout
+-open /login
+-enter test_user's email into element #email
+-enter test_user's password into element #password
+-click element input[type="login"]
+-validate current page is /
+-validate current page contains #sell-ticket header
+-validate current page contains elements #sell-name, #sell-quantitiy, #sell-price, #sell-expiration-date
+
+### Test Case R3.7.1 - This page contains a form that a user can buy new tickets. Fields: name, quantity ###
+
+Mocking:
+-Mock backend.get_user to return test_user intstance
+
+Action:
+-open /logout
+-open /login
+-enter test_user's email into element #email
+-enter test_user's password into element #password
+-click element input[type="login"]
+-validate current page is /
+-validate current page contains #buy-ticket header
+-validate current page contains elements #buy-name, #buy-quantitiy
+
+### Test Case R3.8.1 - This page contains a form that a user can update existing tickets. Fields: name, quantity, price, expiration date ###
+
+Mocking:
+-Mock backend.get_user to return test_user intstance
+
+Action:
+-open /logout
+-open /login
+-enter test_user's email into element #email
+-enter test_user's password into element #password
+-click element input[type="login"]
+-validate current page is /
+-validate current page contains #update-ticket header
+-validate current page contains elements #update-name, #update-quantitiy, #update-price, #update-expiration-date
+
+### Test Case R3.9.1 - The ticket-selling form can be posted to /sell - Positive ###
+
+Mocking:
+-Mock backend.get_user to return test_user intstance
+-Mock backend.get_user to return test_ticket instance
+
+Actions:
+-open /logout
+-open /login
+-enter test_user's email into element #email
+-enter test_user's password into element #password
+-click element input[type="login"]
+-enter test_ticket's name into #sell-name element
+-enter test_ticket's quantity into #sell-quantity element
+-enter test_ticket's sell price into the #sell-price element
+-enter test_ticket's expiration date into the #sell-expiration-date
+-click element input[type="submit"]
+-validate that the #sell-message element displays: "Ticket successfully placed in system."
+
+### Test Case R3.10.1 - The ticket-buying form can be posted to /buy ###
+
+Mocking:
+-Mock backend.get_user to return test_user intstance
+-Mock backend.get_user to return test_ticket instance
+
+Actions:
+-open /logout
+-open /login
+-enter test_user's email into element #email
+-enter test_user's password into element #password
+-click element input[type="login"]
+-enter test_ticket's name into #buy-name element
+-enter test_ticket's quantity into #buy-quantity element
+-click element input[type="submit"]
+-validate that the #sell-message element displays: "Ticket(s) successfully purchased from system."
+
+### Test Case R3.11.1 - The ticket-update form can be posted to /update ###
+
+Mocking:
+-Mock backend.get_user to return test_user intstance
+-Mock backend.get_user to return test_ticket instance
+
+Actions:
+-open /logout
+-open /login
+-enter test_user's email into element #email
+-enter test_user's password into element #password
+-click element input[type="login"]
+-enter test_ticket's name into #update-name element
+-enter test_ticket's quantity into #update-quantity element
+-enter test_ticket's sell price into the #update-price element
+-enter test_ticket's expiration date into the #update-expiration-date
+-click element input[type="submit"]
+-validate that the #sell-message element displays: "Ticket successfully updated."
