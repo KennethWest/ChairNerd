@@ -224,6 +224,12 @@ test_ticket1 = Ticket(
 **R7**
 Logout will invalid the current session and redirect to the login page. After logout, the user shouldn't be able to access restricted pages.
 
+`test_user = User(
+    email='test_frontend@test.com',
+    name='test_frontend',
+    password=generate_password_hash('test_frontend')
+)`
+
 **Mocking:**
 
 * Mock backend.get_user
