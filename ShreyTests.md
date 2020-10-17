@@ -386,7 +386,7 @@ Logout will invalid the current session and redirect to the login page. After lo
 
 **Mocking:**
 
-* Mock backend.get_user
+* Mock backend.get_user to return a test_user instance
 
 
 **Actions:**
