@@ -244,7 +244,7 @@ Actions:
 - validate all tickets are not expired
 - open /logout
 
-### Test Case R3.6.1 - This page lists all available tickets. Information including the quantity of each ticket, the owner's email, and the price, for tickets that are not expired. ###
+### Test Case R3.6.1 - This page contains a form that a user can submit new tickets for sell. Fields: name, quantity, price, expiration date ###
 
 Mocking:
 - Mock backend.get_user to return test_user intstance
@@ -292,7 +292,7 @@ Action:
 - validate current page contains elements #update-name, #update-quantitiy, #update-price, #update-expiration-date
 - open /logout
 
-### Test Case R3.9.1 - The ticket-selling form can be posted to /sell - Positive ###
+### Test Case R3.9.1 - The ticket-selling form can be posted to /sell ###
 
 Mocking:
 - Mock backend.get_user to return test_user intstance
