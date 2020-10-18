@@ -87,7 +87,7 @@
 | For any other requests /login, /register, /, /login, /buy, /sell, the system should return a 404 error                                               | R8           | Check that 404 errors are handled correctly                                                           |
 
 
-## Test Plan
+## Test Plan ##
 The documentations of the test cases can be found in the root folder of the repository ChairNerd.
 The frontend webpage will be hosted using Flask, and testing will be carried out by PyTest and SeleniumBase. The backend will be mocked so the full scope of the frontend can be tested.
 All test case code will be divided into three scripts: A frontend testing script, a backend testing script, and an integration testing script.
