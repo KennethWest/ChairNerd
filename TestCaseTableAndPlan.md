@@ -13,7 +13,6 @@
 | For any formatting errors, render the login page and show the message 'email/password format is incorrect.'                                          | R1.2.5       | For any incorrectly formatted fields, check that the correct error message shows                      |
 | If email/password are correct, redirect to /                                                                                                         | R1.2.6       | Checking that logging in works with correct log in info                                               |
 | Otherwise, redirect to /login and show message 'email/password combination incorrect'                                                                | cont.        | Checking that logging in handles incorrect log in information correctly                               |
-| 
 | [POST]
 | The name of the ticket has to be alphanumeric-only,  and space allowed only if it is not the first or the last character. 						   | R4.1.1       | Check if the selling actions succeed when the ticket name is alphanumeric-only                                                    |
 |                                                                                                                           						   | R4.1.2       | Check if the selling actions fail when the ticket name contains special characters                                                |
