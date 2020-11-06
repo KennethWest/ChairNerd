@@ -1,9 +1,9 @@
 import pytest
 from seleniumbase import BaseCase
 
-from qa327_test.conftest import base_url
+from ChairNerd.qa327_test.conftest import base_url
 from unittest.mock import patch
-from qa327.models import db, User
+from ChairNerd.qa327.models import db, User
 from werkzeug.security import generate_password_hash, check_password_hash
 
 """
@@ -59,8 +59,7 @@ class FrontEndHomePageTest(BaseCase):
         # front-end, without running the backend logics. 
         # so we patch the backend to return a specific user instance, 
         # rather than running that program. (see @ annotations above)
-        
-        
+
         # open home page
         self.open(base_url)
         # test if the page loads correctly
