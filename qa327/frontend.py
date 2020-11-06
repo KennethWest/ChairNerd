@@ -1,6 +1,7 @@
 from flask import render_template, request, session, redirect
 from qa327 import app
 import qa327.backend as bn
+import re  # regex module required to check for valid emails
 
 """
 This file defines the front-end part of the service.
@@ -52,10 +53,29 @@ def login_get():
     return render_template('login.html', message='Please login')
 
 
+# This code runs when the user clicks the login button on the login page
 @app.route('/login', methods=['POST'])
 def login_post():
     email = request.form.get('email')
     password = request.form.get('password')
+    # check if email is valid
+    email_invalid = False
+    if not re.search("(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)", email):
+        email_invalid = True
+
+    # check if password is valid
+    password_invalid = False
+    if not re.search("^(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*#?&])[A-Za-z\d@$!#%*?&]{6,}$", password):
+        password_invalid = True
+
+    # send the correct error message if either email_invalid or password_invalid are True
+    if email_invalid and password_invalid:
+        return render_template('login.html', message='email/password format is incorrect')
+    elif email_invalid:
+        return render_template('login.html', message='email format is incorrect')
+    elif password_invalid:
+        return render_template('login.html', message='password format is incorrect')
+
     user = bn.login_user(email, password)
     if user:
         session['logged_in'] = user.email
@@ -67,13 +87,12 @@ def login_post():
 
         Here we store the user object into the session, so we can tell
         if the client has already login in the following sessions.
-
         """
         # success! go back to the home page
         # code 303 is to force a 'GET' request
         return redirect('/', code=303)
     else:
-        return render_template('login.html', message='login failed')
+        return render_template('login.html', message='email/password combination incorrect')
 
 
 @app.route('/logout')
