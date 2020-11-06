@@ -30,7 +30,7 @@ def login_user(email, password):
     return user
 
 
-def register_user(email, name, password, password2):
+def register_user(email, name, password):
     """
     Register the user to the database
     :param email: the email of the user
