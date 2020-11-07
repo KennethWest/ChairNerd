@@ -127,3 +127,7 @@ def profile(user):
     # front-end portals
     tickets = bn.get_all_tickets()
     return render_template('index.html', user=user, tickets=tickets)
+
+@app.errorhandler(404)
+def not_found_404(error):
+    return render_template('404.html', message='Uh Oh! Something is not quite right here, maybe you tried to access a page you do not have access to or one that has recently been deleted.'), 404
