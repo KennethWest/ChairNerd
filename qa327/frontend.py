@@ -40,7 +40,7 @@ def authenticate(inner_function):
             # else, redirect to the login page
             return redirect('/login')
 
-    # Renaming the function name:
+    # renaming the function name to work with multiple functions
     wrapped_inner.__name__ = inner_function.__name__
 
     # return the wrapped version of the inner_function:
