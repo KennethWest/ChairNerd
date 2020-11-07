@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<h1>{% block title %}404 - Not Found{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+<h4 id='message'>{{message}}</h4>
+<a href='/login' class="btn btn-primary" id="btn-submit" >Login</a>
+{% endblock %}
