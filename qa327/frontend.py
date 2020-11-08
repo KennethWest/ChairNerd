@@ -18,6 +18,7 @@ def sell_post():
     expiry = request.form.get('expiry')
     error_message = None
     bn.create_ticket(name, quantity, price, expiry)
+    return redirect('/')
 
 
 @app.route('/sell', methods=['GET'])
