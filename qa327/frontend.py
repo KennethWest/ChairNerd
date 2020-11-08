@@ -1,6 +1,9 @@
 from flask import render_template, request, session, redirect
 from qa327 import app
 import qa327.backend as bn
+from sqlalchemy import update
+
+from qa327.models import Tickets
 
 """
 This file defines the front-end part of the service.
@@ -17,7 +20,8 @@ def sell_post():
     price = request.form.get('price')
     expiry = request.form.get('expiry')
     error_message = None
-    bn.create_ticket(name, quantity, price, expiry)
+    owner = session['logged_in']
+    bn.create_ticket(name, quantity, price, expiry, owner)
     return redirect('/')
 
 
@@ -31,6 +35,17 @@ def buy_post():
     name = request.form.get('name')
     quantity = request.form.get('quantity')
     error_message = None
+    ticket = Tickets.query.filter(Tickets.name == name).first()
+    email = session['logged_in']
+    newBalance = bn.get_user(email).balance - ticket.price * quantity
+    if ticket.quantity < quantity:
+        Tickets.delete(ticket)
+    else:
+        quant = ticket.quantity - quantity
+        update(ticket).values(quantity=quant)
+        update(bn.get_user(email)).values(balance=newBalance)
+
+    return redirect('/')
 
 
 @app.route('/update', methods=['POST'])
@@ -39,7 +54,10 @@ def update_post():
     quantity = request.form.get('quantity')
     price = request.form.get('price')
     expiry = request.form.get('expiry')
+    email = session['logged_in']
     error_message = None
+    update(Tickets).where(Tickets.owner == email).values(name=name, quantity=quantity, price=price, expiry=expiry)
+    return redirect('/')
 
 
 @app.route('/register', methods=['GET'])

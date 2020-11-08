@@ -49,9 +49,9 @@ def register_user(email, name, password, password2):
     return None
 
 
-def create_ticket(name, quantity, price, expiry):
+def create_ticket(name, quantity, price, expiry, owner):
     date = datetime.strptime(expiry, '%Y/%m/%d')
-    new_ticket = Tickets(name=name, price=price, quantity=quantity, expiry=date)
+    new_ticket = Tickets(name=name, price=price, quantity=quantity, expiry=date, owner=owner)
     db.session.add(new_ticket)
     db.session.commit()
     return None
