@@ -22,7 +22,7 @@
 
 
 <h3> Sell tickets: </h3>
-<form method="post">
+<form action="/sell" method="post">
   <div class="form-group">
     <label for="sell name">Name:</label>
     <input class="form-control" name="name" id="sell name" required>
@@ -32,8 +32,7 @@
     <input class="form-control" type="price" name="price" id="sell price" required>
     <label for="sell expiry">Expiry:</label>
     <input class="form-control" type="expiry" name="expiry" id="sell expiry" required>
-     <input class="btn btn-primary" type="submit" value="Sell">
-    <a href='/sell' class="btn btn-primary" id="sell-btn-submit" >Sell</a>
+    <input class="btn btn-primary" type="submit" value="Sell">
   </div>
 </form>
 

@@ -10,7 +10,7 @@ The html templates are stored in the 'templates' folder.
 """
 
 
-@app.route('/', methods=['POST'])
+@app.route('/sell', methods=['POST'])
 def sell_post():
     name = request.form.get('name')
     quantity = request.form.get('quantity')
@@ -21,8 +21,8 @@ def sell_post():
 
 
 @app.route('/sell', methods=['GET'])
-def get_post():
-    return render_template('register.html', message='')
+def sell_get():
+    return render_template('register.html', message='')  # this should be sell.html
 
 
 @app.route('/buy', methods=['POST'])
