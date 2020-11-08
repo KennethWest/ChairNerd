@@ -5,18 +5,64 @@
 {% endblock %}
 
 {% block content %}
-<h2 id="welcome-header">Welcome {{ user.name }} !</h2>
+<h2 id="welcome-header">Welcome {{ user.name }}!</h2>
 
+<h5> Your balance is: ${{ user.balance }}  </h5>
 
-<h2 >Here are all available tickets</h2>
+<h2> Here are all available tickets </h2>
 
 <div id="tickets">
 {% for ticket in tickets %}
     <div>
-        <h4>{{ ticket.name }} {{ ticket.price }}</h4>
+        <h4>{{ ticket.name }} {{ ticket.price }} {{ ticket.quantity }} {{ ticket.owner }}</h4>
+
     </div>
 {% endfor %}
 </div>
+
+
+<h3> Sell tickets: </h3>
+<form method="post">
+  <div class="form-group">
+    <label for="sell name">Name:</label>
+    <input class="form-control" name="name" id="sell name" required>
+    <label for="sell quantity">Quantity:</label>
+    <input class="form-control" type="quantity" name="quantity" id="sell quantity" required>
+    <label for="sell price">Price:</label>
+    <input class="form-control" type="price" name="price" id="sell price" required>
+    <label for="sell expiry">Expiry:</label>
+    <input class="form-control" type="expiry" name="expiry" id="sell expiry" required>
+     <input class="btn btn-primary" type="submit" value="Sell">
+    <a href='/sell' class="btn btn-primary" id="sell-btn-submit" >Sell</a>
+  </div>
+</form>
+
+<h3> Buy tickets: </h3>
+<form method="post">
+  <div class="form-group">
+    <label for="buy name">Ticket name:</label>
+    <input class="form-control" name="name" id="buy name" required>
+    <label for="buy quantity">Ticket quantity:</label>
+    <input class="form-control" type="quantity" name="quantity" id="buy quantity" required>
+    <a href='/buy' class="btn btn-primary" id="buy-btn-submit" >Buy</a>
+  </div>
+</form>
+
+<h3> Update ticket: </h3>
+<form method="post">
+  <div class="form-group">
+    <label for="update name">Ticket name:</label>
+    <input class="form-control" name="name" id="update name" required>
+    <label for="update quantity">Quantity:</label>
+    <input class="form-control" type="quantity" name="quantity" id="update quantity" required>
+    <label for="update price">Price:</label>
+    <input class="form-control" type="price" name="price" id="update price" required>
+    <label for="update expiry">Expiry:</label>
+    <input class="form-control" type="expiry" name="expiry" id="update expiry" required>
+    <a href='/update' class="btn btn-primary" id="update-btn-submit" >Update</a>
+  </div>
+</form>
+
 
 <a href='/logout'>logout</a>
 {% endblock %}

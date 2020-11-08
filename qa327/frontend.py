@@ -10,6 +10,37 @@ The html templates are stored in the 'templates' folder.
 """
 
 
+@app.route('/', methods=['POST'])
+def sell_post():
+    name = request.form.get('name')
+    quantity = request.form.get('quantity')
+    price = request.form.get('price')
+    expiry = request.form.get('expiry')
+    error_message = None
+    bn.create_ticket(name, quantity, price, expiry)
+
+
+@app.route('/sell', methods=['GET'])
+def get_post():
+    return render_template('register.html', message='')
+
+
+@app.route('/buy', methods=['POST'])
+def buy_post():
+    name = request.form.get('name')
+    quantity = request.form.get('quantity')
+    error_message = None
+
+
+@app.route('/update', methods=['POST'])
+def update_post():
+    name = request.form.get('name')
+    quantity = request.form.get('quantity')
+    price = request.form.get('price')
+    expiry = request.form.get('expiry')
+    error_message = None
+
+
 @app.route('/register', methods=['GET'])
 def register_get():
     # templates are stored in the templates folder
@@ -23,7 +54,6 @@ def register_post():
     password = request.form.get('password')
     password2 = request.form.get('password2')
     error_message = None
-
 
     if password != password2:
         error_message = "The passwords do not match"
