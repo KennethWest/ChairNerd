@@ -1,6 +1,9 @@
 from flask import render_template, request, session, redirect
 from qa327 import app
 import qa327.backend as bn
+from sqlalchemy import update
+
+from qa327.models import Tickets
 
 """
 This file defines the front-end part of the service.
@@ -8,6 +11,53 @@ It elaborates how the services should handle different
 http requests from the client (browser) through templating.
 The html templates are stored in the 'templates' folder. 
 """
+
+
+@app.route('/sell', methods=['POST'])
+def sell_post():
+    name = request.form.get('name')
+    quantity = request.form.get('quantity')
+    price = request.form.get('price')
+    expiry = request.form.get('expiry')
+    error_message = None
+    owner = session['logged_in']
+    bn.create_ticket(name, quantity, price, expiry, owner)
+    return redirect('/')
+
+
+@app.route('/sell', methods=['GET'])
+def sell_get():
+    return render_template('register.html', message='')  # this should be sell.html
+
+
+@app.route('/buy', methods=['POST'])
+def buy_post():
+    name = request.form.get('name')
+    quantity = request.form.get('quantity')
+    error_message = None
+    ticket = Tickets.query.filter(Tickets.name == name).first()
+    email = session['logged_in']
+    newBalance = bn.get_user(email).balance - ticket.price * quantity
+    if ticket.quantity < quantity:
+        Tickets.delete(ticket)
+    else:
+        quant = ticket.quantity - quantity
+        update(ticket).values(quantity=quant)
+        update(bn.get_user(email)).values(balance=newBalance)
+
+    return redirect('/')
+
+
+@app.route('/update', methods=['POST'])
+def update_post():
+    name = request.form.get('name')
+    quantity = request.form.get('quantity')
+    price = request.form.get('price')
+    expiry = request.form.get('expiry')
+    email = session['logged_in']
+    error_message = None
+    update(Tickets).where(Tickets.owner == email).values(name=name, quantity=quantity, price=price, expiry=expiry)
+    return redirect('/')
 
 
 @app.route('/register', methods=['GET'])
@@ -23,7 +73,6 @@ def register_post():
     password = request.form.get('password')
     password2 = request.form.get('password2')
     error_message = None
-
 
     if password != password2:
         error_message = "The passwords do not match"
