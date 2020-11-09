@@ -6,12 +6,49 @@ import re
 from sqlalchemy import update
 from qa327.models import Tickets
 
+
 """
 This file defines the front-end part of the service.
 It elaborates how the services should handle different
 http requests from the client (browser) through templating.
 The html templates are stored in the 'templates' folder. 
 """
+
+def authenticate(inner_function):
+    """
+    :param inner_function: any python function that accepts a user object
+
+    Wrap any python function and check the current session to see if
+    the user has logged in. If login, it will call the inner_function
+    with the logged in user object.
+
+    To wrap a function, we can put a decoration on that function.
+    Example:
+
+    @authenticate
+    def home_page(user):
+        pass
+    """
+
+    def wrapped_inner():
+
+        # check did we store the key in the session
+        if 'logged_in' in session:
+            email = session['logged_in']
+            user = bn.get_user(email)
+            if user:
+                # if the user exists, call the inner_function
+                # with user as parameter
+                return inner_function(user)
+        else:
+            # else, redirect to the login page
+            return redirect('/login')
+
+    # renaming the function name to work with multiple functions
+    wrapped_inner.__name__ = inner_function.__name__
+
+    # return the wrapped version of the inner_function:
+    return wrapped_inner
 
 
 @app.route('/sell', methods=['POST'])
@@ -102,14 +139,36 @@ def register_post():
 
 
 @app.route('/login', methods=['GET'])
-def login_get():
+@authenticate
+def login_get(user):
+    if user:
+        return redirect('/')
     return render_template('login.html', message='Please login')
 
 
+# This code runs when the user clicks the login button on the login page
 @app.route('/login', methods=['POST'])
 def login_post():
     email = request.form.get('email')
     password = request.form.get('password')
+    # check if email is valid
+    email_invalid = False
+    if not re.search("(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)", email):
+        email_invalid = True
+
+    # check if password is valid
+    password_invalid = False
+    if not re.search("^(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*#?&])[A-Za-z\d@$!#%*?&]{6,}$", password):
+        password_invalid = True
+
+    # send the correct error message if either email_invalid or password_invalid are True
+    if email_invalid and password_invalid:
+        return render_template('login.html', message='email/password format is incorrect')
+    elif email_invalid:
+        return render_template('login.html', message='email format is incorrect')
+    elif password_invalid:
+        return render_template('login.html', message='password format is incorrect')
+
     user = bn.login_user(email, password)
     if user:
         session['logged_in'] = user.email
@@ -126,7 +185,7 @@ def login_post():
         # code 303 is to force a 'GET' request
         return redirect('/', code=303)
     else:
-        return render_template('login.html', message='login failed')
+        return render_template('login.html', message='email/password combination incorrect')
 
 
 @app.route('/logout')
@@ -140,7 +199,7 @@ def authenticate(inner_function):
     """
     :param inner_function: any python function that accepts a user object
 
-    Wrap any python function and check the current session to see if 
+    Wrap any python function and check the current session to see if
     the user has logged in. If login, it will call the inner_function
     with the logged in user object.
 
