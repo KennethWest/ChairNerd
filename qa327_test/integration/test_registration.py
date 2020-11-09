@@ -1,7 +1,7 @@
 import pytest
 from seleniumbase import BaseCase
 
-from qa327_test.conftest import base_url
+from ChairNerd.qa327_test.conftest import base_url
 
 
 # integration testing: the test case interacts with the 

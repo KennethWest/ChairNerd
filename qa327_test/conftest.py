@@ -4,13 +4,14 @@ import os
 import signal
 import time
 import tempfile
-from qa327.__main__ import FLASK_PORT
-from qa327.__main__ import app
+from ChairNerd.qa327.__main__ import FLASK_PORT
+from ChairNerd.qa327.__main__ import app
 import threading
 from werkzeug.serving import make_server
 
 
 base_url = 'http://localhost:{}'.format(FLASK_PORT)
+
 
 class ServerThread(threading.Thread):
 
@@ -40,4 +41,3 @@ def server():
         yield
         server.shutdown()
         time.sleep(2)
-        
