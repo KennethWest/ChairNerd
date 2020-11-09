@@ -1,7 +1,11 @@
 from flask import render_template, request, session, redirect
 from qa327 import app
 import qa327.backend as bn
-import re  # regex module required to check for valid emails
+import random
+import re
+from sqlalchemy import update
+from qa327.models import Tickets
+
 
 """
 This file defines the front-end part of the service.
@@ -47,6 +51,53 @@ def authenticate(inner_function):
     return wrapped_inner
 
 
+@app.route('/sell', methods=['POST'])
+def sell_post():
+    name = request.form.get('name')
+    quantity = request.form.get('quantity')
+    price = request.form.get('price')
+    expiry = request.form.get('expiry')
+    error_message = None
+    owner = session['logged_in']
+    bn.create_ticket(name, quantity, price, expiry, owner)
+    return redirect('/')
+
+
+@app.route('/sell', methods=['GET'])
+def sell_get():
+    return render_template('register.html', message='')  # this should be sell.html
+
+
+@app.route('/buy', methods=['POST'])
+def buy_post():
+    name = request.form.get('name')
+    quantity = request.form.get('quantity')
+    error_message = None
+    ticket = Tickets.query.filter(Tickets.name == name).first()
+    email = session['logged_in']
+    newBalance = bn.get_user(email).balance - ticket.price * quantity
+    if ticket.quantity < quantity:
+        Tickets.delete(ticket)
+    else:
+        quant = ticket.quantity - quantity
+        update(ticket).values(quantity=quant)
+        update(bn.get_user(email)).values(balance=newBalance)
+
+    return redirect('/')
+
+
+@app.route('/update', methods=['POST'])
+def update_post():
+    name = request.form.get('name')
+    quantity = request.form.get('quantity')
+    price = request.form.get('price')
+    expiry = request.form.get('expiry')
+    email = session['logged_in']
+    error_message = None
+    update(Tickets).where(Tickets.owner == email).values(name=name, quantity=quantity, price=price, expiry=expiry)
+    return redirect('/')
+
+
 @app.route('/register', methods=['GET'])
 def register_get():
     # templates are stored in the templates folder
@@ -61,25 +112,28 @@ def register_post():
     password2 = request.form.get('password2')
     error_message = None
 
-
     if password != password2:
         error_message = "The passwords do not match"
 
-    elif len(email) < 1:
-        error_message = "Email format error"
+    elif not re.search("(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)", email):
+        error_message = "Email format is incorrect"
 
-    elif len(password) < 1:
+    elif not re.search("^(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*#?&])[A-Za-z\d@$!#%*?&]{6,}$", password):
         error_message = "Password not strong enough"
+
+    elif len(name) > 20 or len(name) < 3 or name[0] == " " or name[-1] == " " or not (name.replace(" ", "").isalnum()):
+        error_message = "Name format is incorrect."
+
     else:
         user = bn.get_user(email)
         if user:
-            error_message = "User exists"
-        elif not bn.register_user(email, name, password, password2):
+            error_message = "this email has been ALREADY used"
+        elif not bn.register_user(email, name, password):
             error_message = "Failed to store user info."
     # if there is any error messages when registering new user
     # at the backend, go back to the register page.
     if error_message:
-        return render_template('register.html', message=error_message)
+        return render_template('login.html', message=error_message)
     else:
         return redirect('/login')
 
@@ -169,10 +223,22 @@ def authenticate(inner_function):
                 return inner_function(user)
         else:
             # else, redirect to the login page
+            # print(wrapped_inner().__name__)
+            if inner_function.__name__ == "register_get":
+                return render_template('register.html', message='')
             return redirect('/login')
 
+    # the only way I could get this decorator to work
+    wrapped_inner.__name__ = str(random.random())
     # return the wrapped version of the inner_function:
     return wrapped_inner
+
+
+@app.route('/register', methods=['GET'])
+@authenticate
+def register_get(user):
+    # templates are stored in the templates folder
+    return redirect('/')
 
 
 @app.route('/')
@@ -185,3 +251,4 @@ def profile(user):
     # front-end portals
     tickets = bn.get_all_tickets()
     return render_template('index.html', user=user, tickets=tickets)
+

@@ -1,7 +1,7 @@
 import pytest
 import requests
 
-from qa327_test.conftest import base_url
+from ChairNerd.qa327_test.conftest import base_url
 
 """
 Simple test case for server connection
