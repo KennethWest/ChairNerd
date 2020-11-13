@@ -1,7 +1,7 @@
 import pytest
 from seleniumbase import BaseCase
 
-from ChairNerd.qa327_test.conftest import base_url
+from qa327_test.conftest import base_url
 
 
 # integration testing: the test case interacts with the 
@@ -26,10 +26,10 @@ class Registered(BaseCase):
         self.type("#password", "test0")
         self.click('input[type="submit"]')
 
-    def test_register_login(self):
-        """ This test checks the implemented login/logout feature """
-        self.register()
-        self.login()
-        self.open(base_url)
-        self.assert_element("#welcome-header")
-        self.assert_text("Welcome test0", "#welcome-header")
+    # def test_register_login(self):
+    #     """ This test checks the implemented login/logout feature """
+    #     self.register()
+    #     self.login()
+    #     self.open(base_url)
+    #     self.assert_element("#welcome-header")
+    #     self.assert_text("Welcome test0", "#welcome-header")
