@@ -42,6 +42,8 @@ def authenticate(inner_function):
                 return inner_function(user)
         else:
             # else, redirect to the login page
+            if inner_function.__name__ == "login_get":
+                return inner_function(None)
             return redirect('/login')
 
     # renaming the function name to work with multiple functions
