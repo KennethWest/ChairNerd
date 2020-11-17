@@ -28,9 +28,9 @@ Actions:
 New Test Data:
 ``
 test_user = User(
-    email='testuser@example.com',
-    name='tester',
-    password='Tester_pass'
+    email='test_frontend@test.com',
+    name='test frontend',
+    password='Test_frontend#'
 )
 ``
 
@@ -45,7 +45,7 @@ Actions:
 - open /login
 - enter tester's email into the email element
 - enter tester's password into the password element
-- click the sign in button
+- click the log in button
 - validate that you are on tester's profile page
 - reload the root page
 - open /login
@@ -68,13 +68,15 @@ Actions:
 
 Mocking:
 
-- mock backend to send a post request to /login for email and password information
+- mock backend.get_user to return a test_user instance
 
 Actions:
 
-- send a post request to /login
 - open /login
-- validate that you are taken to the user page without logging in via the form manually
+- enter tester's email into the email element
+- enter tester's password into the password element
+- click the log in button (post request)
+- validate that you are on tester's profile page
 
 
 **Test case R1.2.2 - Email and password both cannot be empty**
@@ -87,11 +89,12 @@ Actions:
 
 - open /login
 - click the 'sign in' button
-- validate that an error message is shown
+- validate that we are still on /login
 
 
 **Test case R1.2.3 - Email has to follow addr-spec defined in RFC 5322**
 **Additional test case R1.2.5 - For any formatting errors, render the login page and show the message 'email/password format is incorrect.'**
+
 Mocking:
 
 - mock backend.get_user to return a test_user instance
