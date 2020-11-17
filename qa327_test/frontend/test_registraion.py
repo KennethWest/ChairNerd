@@ -1,4 +1,5 @@
 import pytest
+import pdb
 from seleniumbase import BaseCase
 
 from qa327_test.conftest import base_url
@@ -28,8 +29,8 @@ test_userR1 = User(
     password=generate_password_hash('Testfrontend#')
 )
 
-# Moch some sample tickets
-test_tickets = [
+# Mock some sample tickets
+test_ticketsR1 = [
     {'name': 't1', 'price': '100'}
 ]
 
@@ -39,8 +40,6 @@ class FrontEndHomePageTest(BaseCase):
     #################
     # R1 test cases #
     #################
-    @patch('qa327.backend.get_user', return_value=test_userR1)
-    @patch('qa327.backend.get_all_tickets', return_value=test_tickets)
     def test_login_redirect_from_base(self, *_):
         """
         Test case R1.1.1
@@ -50,24 +49,25 @@ class FrontEndHomePageTest(BaseCase):
         # go to main page
         self.open(base_url)
         # validate that the user is taken to /login
+        assert self.get_current_url() == base_url + '/login'
         self.assert_text('Log In', 'h1')
 
-
-    @patch('qa327.backend.get_user', return_value=test_userR1)
-    @patch('qa327.backend.get_all_tickets', return_value=test_tickets)
     def test_login_prompt_message(self, *_):
         """
         Test case R1.1.2
         """
         # make sure we're logged out
         self.open(base_url + '/logout')
+        # open /login
+        self.open(base_url + '/login')
+        # validate that we are on /login
+        assert self.get_current_url() == base_url + '/login'
         # validate that the user is shown a message that says 'please login'
         self.assert_element('#message')
         self.assert_text('Please login', '#message')
 
     @patch('qa327.backend.get_user', return_value=test_userR1)
-    @patch('qa327.backend.login_user', return_value=True) # force a login;should crash
-    @patch('qa327.backend.get_all_tickets', return_value=test_tickets)
+    @patch('qa327.backend.get_all_tickets', return_value=test_ticketsR1)
     def test_redirect_to_user_page_if_logged_in(self, *_):
         """
         Test case R1.1.3
@@ -82,6 +82,7 @@ class FrontEndHomePageTest(BaseCase):
         # click the log in button
         self.click('input[type="submit"]')
         # validate that we are on the correct profile page
+        assert self.get_current_url() == base_url + '/'
         self.assert_element("#welcome-header")
         self.assert_text("Welcome test frontend!", "#welcome-header")
         # reload the root page
@@ -89,11 +90,10 @@ class FrontEndHomePageTest(BaseCase):
         # open /login
         self.open(base_url + '/login')
         # validate that we are on the correct profile page
+        assert self.get_current_url() == base_url + '/'
         self.assert_element("#welcome-header")
         self.assert_text("Welcome test frontend!", "#welcome-header")
 
-    @patch('qa327.backend.get_user', return_value=test_userR1)
-    @patch('qa327.backend.get_all_tickets', return_value=test_tickets)
     def test_email_password_field_exists(self, *_):
         """
         Test case R1.1.4
@@ -107,13 +107,13 @@ class FrontEndHomePageTest(BaseCase):
         self.assert_element('#password')
 
     @patch('qa327.backend.get_user', return_value=test_userR1)
-    @patch('qa327.backend.get_all_tickets', return_value=test_tickets)
+    @patch('qa327.backend.get_all_tickets', return_value=test_ticketsR1)
     def test_login_post(self, *_):
         """
         Test case R1.2.1
         """
         # make sure we're logged out
-        self.open('/logout')
+        self.open(base_url + '/logout')
         # open /login
         self.open(base_url + '/login')
         # type in login info
@@ -122,32 +122,34 @@ class FrontEndHomePageTest(BaseCase):
         # click the log in button
         self.click('input[type="submit"]')
         # validate that we are on the correct profile page
+        assert self.get_current_url() == base_url + '/'
         self.assert_element("#welcome-header")
         self.assert_text("Welcome test frontend!", "#welcome-header")
 
     @patch('qa327.backend.get_user', return_value=test_userR1)
-    @patch('qa327.backend.get_all_tickets', return_value=test_tickets)
+    @patch('qa327.backend.get_all_tickets', return_value=test_ticketsR1)
     def test_email_password_must_exist(self, *_):
         """
         Test case R1.2.2
         """
         # make sure we're logged out
-        self.open('/logout')
+        self.open(base_url + '/logout')
         # open /login
         self.open(base_url + '/login')
         # click the log in button
         self.click('input[type="submit"]')
         # validate that we are still on /login
+        assert self.get_current_url() == base_url + '/login'
         self.assert_text('Log In', 'h1')
 
     @patch('qa327.backend.get_user', return_value=test_userR1)
-    @patch('qa327.backend.get_all_tickets', return_value=test_tickets)
+    @patch('qa327.backend.get_all_tickets', return_value=test_ticketsR1)
     def test_login_email_format(self, *_):
         """
-        Test case R1.2.3
+        Test case R1.2.3 and R1.2.5
         """
         # make sure we're logged out
-        self.open('/logout')
+        self.open(base_url + '/logout')
         # open /login
         self.open(base_url + '/login')
         # enter in a wrong format email and a correct format password
@@ -155,24 +157,28 @@ class FrontEndHomePageTest(BaseCase):
         self.type('#password', 'GoodPassword#')
         # click the log in button
         self.click('input[type="submit"]')
+        # validate that we were not rerouted
+        assert self.get_current_url() == base_url + '/login'
         # validate that the correct error message is displayed
         self.assert_text('email format is incorrect', '#message')
-        # enter in a correct format email and a correct format password
-        self.type('#email', 'test@example.com')
-        self.type('#password', 'GoodPassword#')
+        # enter in a correct email and a correct password
+        self.type('#email', 'test_frontend@test.com')
+        self.type('#password', 'Testfrontend#')
         # click the log in button
         self.click('input[type="submit"]')
-        # validate that the correct error message is displayed
-        assert self.get_text('#message') != 'email format is incorrect'
+        # validate that we are on the correct profile page
+        assert self.get_current_url() == base_url + '/'
+        self.assert_element("#welcome-header")
+        self.assert_text("Welcome test frontend!", "#welcome-header")
 
     @patch('qa327.backend.get_user', return_value=test_userR1)
-    @patch('qa327.backend.get_all_tickets', return_value=test_tickets)
+    @patch('qa327.backend.get_all_tickets', return_value=test_ticketsR1)
     def test_login_password_format(self, *_):
         """
-        Test case R1.2.4
+        Test case R1.2.4 and R1.2.5
         """
         # make sure we're logged out
-        self.open('/logout')
+        self.open(base_url + '/logout')
         # open /login
         self.open(base_url + '/login')
         # enter in a correct format email and a wrong format password
@@ -182,23 +188,24 @@ class FrontEndHomePageTest(BaseCase):
         self.click('input[type="submit"]')
         # validate that the correct error message is displayed
         self.assert_text('password format is incorrect', '#message')
-        # enter in a correct format email and a correct format password
-        # these credentials should not exist, #message should show a "user not found" related error
-        self.type('#email', 'test@example.com')
-        self.type('#password', 'GoodPassword#')
+        # enter in a correct email and a correct password
+        self.type('#email', 'test_frontend@test.com')
+        self.type('#password', 'Testfrontend#')
         # click the log in button
         self.click('input[type="submit"]')
-        # validate that the correct error message is displayed
-        assert self.get_text('#message') != 'password format is incorrect'
+        # validate that we are on the correct profile page
+        assert self.get_current_url() == base_url + '/'
+        self.assert_element("#welcome-header")
+        self.assert_text("Welcome test frontend!", "#welcome-header")
 
     @patch('qa327.backend.get_user', return_value=test_userR1)
-    @patch('qa327.backend.get_all_tickets', return_value=test_tickets)
+    @patch('qa327.backend.get_all_tickets', return_value=test_ticketsR1)
     def test_login_password_format(self, *_):
         """
         Test case R1.2.6
         """
         # make sure we're logged out
-        self.open('/logout')
+        self.open(base_url + '/logout')
         # open /login
         self.open(base_url + '/login')
         # enter incorrect credentials
@@ -217,6 +224,9 @@ class FrontEndHomePageTest(BaseCase):
         self.assert_element("#welcome-header")
         self.assert_text("Welcome test frontend!", "#welcome-header")
 
+    ######################
+    # Example Test cases #
+    ######################
     # @patch('qa327.backend.get_user', return_value=test_user)
     # @patch('qa327.backend.get_all_tickets', return_value=test_tickets)
     # def test_login_success(self, *_):

@@ -172,7 +172,7 @@ def login_post():
         return render_template('login.html', message='password format is incorrect')
 
     user = bn.login_user(email, password)
-    if user:
+    if user != None:  # if there is an email, there is a user
         session['logged_in'] = user.email
         """
         Session is an object that contains sharing information 

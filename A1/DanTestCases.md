@@ -5,7 +5,7 @@
 
 Mocking:
 
-- mock backend.get_user to return a test_user instance
+- no mocking
 
 Actions:
 
@@ -17,7 +17,7 @@ Actions:
 
 Mocking:
 
-- mock backend.get_user to return a test_user instance
+- no mocking
 
 Actions:
 
@@ -26,13 +26,17 @@ Actions:
 
 
 New Test Data:
-``
+```
 test_user = User(
     email='test_frontend@test.com',
     name='test frontend',
     password='Test_frontend#'
 )
-``
+
+test_ticketsR1 = [
+    {'name': 't1', 'price': '100'}
+]
+```
 
 **Test case R1.1.3 - If the user has logged in, redirect to the user profile page**
 
@@ -56,7 +60,7 @@ Actions:
 
 Mocking:
 
-- mock backend.get_user to return a test_user instance
+- no mocking
 
 Actions:
 
