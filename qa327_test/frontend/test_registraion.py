@@ -27,7 +27,6 @@ the user from the database.
 Annotate @patch before unit tests can mock backend methods (for that testing function)
 """
 
-# Mock a sample user
 test_userR1 = User(
     email='test_frontend@test.com',
     name='test frontend',
@@ -51,6 +50,13 @@ test_userR3 = User(
 test_ticketsR3 = [
     {'name': 't1', 'price': '100', 'quantity': '5', 'owner': 'test1@gmail.com'}
 ]
+
+# Mock a sample user
+test_user_r7 = User(
+    email='test_frontend@test.com',
+    name='Test_frontend$',
+    password=generate_password_hash('test_frontend')
+)
 
 class FrontEndHomePageTest(BaseCase):
 
@@ -442,3 +448,31 @@ class FrontEndHomePageTest(BaseCase):
         self.assert_element("#message")
         self.assert_text("Ticket successfully updated", "#message")
         self.open(base_url + '/logout')
+
+    #R7.1 : Logout will invalid the current session and redirect to the login page. After logout, the user shouldn't be able to access restricted pages.
+    @patch('qa327.backend.get_user', return_value=test_user_r7)
+    def test_logout_redirect_to_login(self, *_):
+    	self.open(base_url + '/logout')
+    	self.open(base_url + '/login')
+    	self.type("#email", "test_frontend@test.com")
+    	self.type("#password", "Test_frontend$")
+    	self.click('input[type="submit"]')
+    	self.open(base_url)
+    	self.open(base_url + '/logout')
+    	self.open(base_url)
+    	self.assert_element("#message")
+    	self.assert_text("Please login", "#message")
+
+    #R8.1 : For any other requests except /login, /register, /, /login, /buy, /sell, the system should return a 404 error
+    def test_other_requests_are_404_errors(self, *_):
+    	self.open(base_url + '/logout')
+    	self.assert_no_404_errors()
+    	self.open(base_url)
+    	self.assert_no_404_errors()
+    	self.open(base_url + '/login')
+    	self.assert_no_404_errors()
+    	self.open(base_url + '/register')
+    	self.assert_no_404_errors()
+    	self.open(base_url + '/fake_domain')
+    	self.assert_element("#message")
+    	self.assert_text("Uh Oh! Something is not quite right here, maybe you tried to access a page you do not have access to or one that has recently been deleted.", "#message")
