@@ -22,7 +22,7 @@ Annotate @patch before unit tests can mock backend methods (for that testing fun
 """
 
 # Mock a sample user
-test_user = User(
+test_user_r7 = User(
     email='test_frontend@test.com',
     name='Test_frontend$',
     password=generate_password_hash('test_frontend')
@@ -84,6 +84,7 @@ class FrontEndHomePageTest(BaseCase):
         self.assert_text("login failed", "#message")
 
     #R7.1 : Logout will invalid the current session and redirect to the login page. After logout, the user shouldn't be able to access restricted pages.
+    @patch('qa327.backend.get_user', return_value=test_user_r7)
     def test_logout_redirect_to_login(self, *_):
     	self.open(base_url + '/logout')
     	self.open(base_url + '/login')
