@@ -4,5 +4,5 @@
 ## Authors
 - Shreyansh Anand
 - Daniel Oh
-- Lia Sanfillipo
+- Lia Sanfilippo
 - Kenneth West
