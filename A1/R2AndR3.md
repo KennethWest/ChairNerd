@@ -1,4 +1,4 @@
-in# Ken's Test Cases R2 & R3 #
+# Ken's Test Cases R2 & R3 #
 
 ## Test Cases For R2: ##
 
@@ -292,7 +292,7 @@ Action:
 - validate current page contains elements #update-name, #update-quantitiy, #update-price, #update-expiration-date
 - open /logout
 
-
+### Test Case R3.9.1 - The ticket-selling form can be posted to /sell ###
 
 Mocking:
 - Mock backend.get_user to return test_user intstance
