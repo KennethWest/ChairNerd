@@ -97,11 +97,6 @@ def update_post():
     return redirect('/')
 
 
-@app.route('/register', methods=['GET'])
-def register_get():
-    # templates are stored in the templates folder
-    return render_template('register.html', message='')
-
 
 @app.route('/register', methods=['POST'])
 def register_post():
@@ -213,7 +208,6 @@ def authenticate(inner_function):
         pass
     """
     def wrapped_inner():
-        print("woah man")
         # check did we store the key in the session
         if 'logged_in' in session:
             email = session['logged_in']
@@ -238,7 +232,6 @@ def authenticate(inner_function):
 @app.route('/register', methods=['GET'])
 @authenticate
 def register_get(user):
-    print("hi!")
     if user:
         return redirect('/')
     return render_template('register.html', message='')
