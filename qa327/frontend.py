@@ -1,11 +1,12 @@
+from datetime import datetime
+
 from flask import render_template, request, session, redirect
 from qa327 import app
 import qa327.backend as bn
 import random
 import re
 from sqlalchemy import update
-from qa327.models import Tickets
-
+from qa327.models import Tickets, db, User
 
 """
 This file defines the front-end part of the service.
@@ -13,6 +14,7 @@ It elaborates how the services should handle different
 http requests from the client (browser) through templating.
 The html templates are stored in the 'templates' folder. 
 """
+
 
 def authenticate(inner_function):
     """
@@ -56,48 +58,89 @@ def authenticate(inner_function):
 @app.route('/sell', methods=['POST'])
 def sell_post():
     name = request.form.get('name')
-    quantity = request.form.get('quantity')
-    price = request.form.get('price')
+    quantity = int(request.form.get('quantity'))
+    price = float(request.form.get('price'))
     expiry = request.form.get('expiry')
     error_message = None
-    owner = session['logged_in']
-    bn.create_ticket(name, quantity, price, expiry, owner)
-    return redirect('/')
+    email = session['logged_in']
+    user = bn.get_user(email)
+    bn.create_ticket(name, quantity, price, expiry, email)
+    tickets = bn.get_all_tickets()
+    error_message = "Ticket successfully posted to sell"
+    return render_template('index.html', message=error_message, user=user, tickets=tickets)
 
 
+'''
 @app.route('/sell', methods=['GET'])
 def sell_get():
-    return render_template('register.html', message='')  # this should be sell.html
+    return render_template('index.html', message='')  # this should be sell.html
+'''
 
 
 @app.route('/buy', methods=['POST'])
 def buy_post():
     name = request.form.get('name')
-    quantity = request.form.get('quantity')
+    quantity = int(request.form.get('quantity'))
     error_message = None
     ticket = Tickets.query.filter(Tickets.name == name).first()
     email = session['logged_in']
-    newBalance = bn.get_user(email).balance - ticket.price * quantity
-    if ticket.quantity < quantity:
-        Tickets.delete(ticket)
+    user = bn.get_user(email)
+    tickets = bn.get_all_tickets()
+    if ticket is None:
+        error_message = "No tickets with that name"
     else:
-        quant = ticket.quantity - quantity
-        update(ticket).values(quantity=quant)
-        update(bn.get_user(email)).values(balance=newBalance)
-
-    return redirect('/')
+        newBalance = float(bn.get_user(email).balance) - (float(ticket.price) * quantity)
+        if ticket.quantity <= quantity:
+            db.session.delete(ticket)
+            user.balance = newBalance
+            db.session.commit()
+        # tickets = bn.get_all_tickets()
+        # return render_template('index.html', message=error_message, user=user, tickets=tickets, balance=newBalance)
+        else:
+            quant = ticket.quantity - quantity
+            ticket.quantity = quant
+            user.balance = newBalance
+            db.session.commit()
+        error_message = "Ticket successfully bought"
+    return render_template('index.html', message=error_message, user=user, tickets=tickets)
 
 
 @app.route('/update', methods=['POST'])
 def update_post():
+    '''
     name = request.form.get('name')
-    quantity = request.form.get('quantity')
-    price = request.form.get('price')
-    expiry = request.form.get('expiry')
-    email = session['logged_in']
+    quantity = int(request.form.get('quantity'))
     error_message = None
-    update(Tickets).where(Tickets.owner == email).values(name=name, quantity=quantity, price=price, expiry=expiry)
-    return redirect('/')
+    ticket = Tickets.query.filter(Tickets.name == name).first()
+    email = session['logged_in']
+    user = bn.get_user(email)
+    tickets = bn.get_all_tickets()
+    if ticket is None:
+        error_message = "No tickets with that name"
+    return render_template('index.html', message=error_message, user=user, tickets=tickets)
+   '''
+
+    name = request.form.get('name')
+    quantity = int(request.form.get('quantity'))
+    price = float(request.form.get('price'))
+    expiry = request.form.get('expiry')
+    error_message = None
+    userTicket = Tickets.query.filter(Tickets.name == name).first()
+    email = session['logged_in']
+    user = bn.get_user(email)
+    tickets = bn.get_all_tickets()
+    if userTicket is None:
+        error_message = "No tickets with that name"
+    else:
+        #date = datetime.strptime(expiry, '%Y/%m/%d')
+        #x = expiry.split('/')
+        #date = datetime.datetime(x[0], x[1], x[2])
+        userTicket.quantity = quantity
+        userTicket.price = price
+        userTicket.expiry = expiry
+        db.session.commit()
+        error_message = "Ticket successfully updated"
+    return render_template('index.html', message=error_message, user=user, tickets=tickets)
 
 
 @app.route('/register', methods=['GET'])
@@ -253,9 +296,9 @@ def profile(user):
     # front-end portals
     tickets = bn.get_all_tickets()
     return render_template('index.html', user=user, tickets=tickets)
-  
-  
+
+
 @app.errorhandler(404)
 def not_found_404(error):
-    return render_template('404.html', message='Uh Oh! Something is not quite right here, maybe you tried to access a page you do not have access to or one that has recently been deleted.'), 404
-
+    return render_template('404.html',
+                           message='Uh Oh! Something is not quite right here, maybe you tried to access a page you do not have access to or one that has recently been deleted.'), 404
