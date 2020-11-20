@@ -1,7 +1,7 @@
 # What is Changed
-- Added the automated test cases for R3
-- All test cases pass locally, no failures
-- Added this file (pull_request_template)
+- Enter a summary in point form of what has changed in your pull request
+- (e.g. implemented quicksort in place of bubble sort and changed the function names to be more descriptive)
 
 # @mentions
-- N/A
+- @ any reviewer and leave a message for them
+- (e.g. @JohnSmith what do you think of implementing quicksort like this?)

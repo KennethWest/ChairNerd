@@ -178,9 +178,9 @@ def register_post():
     # if there is any error messages when registering new user
     # at the backend, go back to the register page.
     if error_message:
-        return render_template('login.html', message=error_message)
+        return render_template('register.html', message=error_message)
     else:
-        return redirect('/login')
+        return redirect('/')
 
 
 @app.route('/login', methods=['GET'])
@@ -215,7 +215,7 @@ def login_post():
         return render_template('login.html', message='password format is incorrect')
 
     user = bn.login_user(email, password)
-    if user:
+    if user != None:  # if there is an email, there is a user
         session['logged_in'] = user.email
         """
         Session is an object that contains sharing information 
