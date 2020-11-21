@@ -1,5 +1,6 @@
-first check failures:
+# First check failures: #
 
+R3.10.1
 ```
     @patch('qa327.backend.get_user', return_value=test_userR3)
     def test_buy_form_post(self, *_):
@@ -18,7 +19,10 @@ first check failures:
         self.click('input[id="buy-submit"]')
         self.assert_element("#message")
 >       self.assert_text("Ticket successfully bought", "#message")
+```
 
+R1.2.3 and R1.2.5
+```
     @patch('qa327.backend.get_user', return_value=test_userR1)
     @patch('qa327.backend.get_all_tickets', return_value=test_ticketsR1)
     def test_login_email_format(self, *_):
@@ -47,7 +51,10 @@ first check failures:
         assert self.get_current_url() == base_url + '/'
         self.assert_element("#welcome-header")
 >       self.assert_text("Welcome test frontend!", "#welcome-header")
+```
 
+R1.2.6
+```
     @patch('qa327.backend.get_user', return_value=test_userR1)
     @patch('qa327.backend.get_all_tickets', return_value=test_ticketsR1)
     def test_login_password_format(self, *_):
@@ -68,7 +75,10 @@ first check failures:
         # enter correct credentials
         self.type('#email', 'test_frontend@test.com')
 >       self.assert_element("#welcome-header")
+```
 
+R1.2.1
+```
     @patch('qa327.backend.get_user', return_value=test_userR1)
     @patch('qa327.backend.get_all_tickets', return_value=test_ticketsR1)
     def test_login_post(self, *_):
@@ -88,7 +98,10 @@ first check failures:
         assert self.get_current_url() == base_url + '/'
         self.assert_element("#welcome-header")
 >       self.assert_text("Welcome test frontend!", "#welcome-header")
+```
 
+R1.1.3
+```
     @patch('qa327.backend.get_user', return_value=test_userR1)
     @patch('qa327.backend.get_all_tickets', return_value=test_ticketsR1)
     def test_redirect_to_user_page_if_logged_in(self, *_):
@@ -108,7 +121,10 @@ first check failures:
         assert self.get_current_url() == base_url + '/'
         self.assert_element("#welcome-header")
 >       self.assert_text("Welcome test frontend!", "#welcome-header")
+```
 
+R3.11.1
+```
     @patch('qa327.backend.get_user', return_value=test_userR3)
     def test_update_form_post(self, *_):
         self.open(base_url + '/logout')
