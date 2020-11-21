@@ -6,3 +6,14 @@
 - Daniel Oh
 - Lia Sanfilippo
 - Kenneth West
+
+## A3 Additional Deliverables
+
+### Notes When Testing
+- No temporary changes were made to the template to accomidate testing methods
+
+### Backend Test: Black box systematic approach
+| Partition | email                 | input                      |
+|-----------|-----------------------|----------------------------|
+| Partition | email in database     | test_frontend@test.com     |
+| Partition | email not in database | not_test_frontend@test.com |
