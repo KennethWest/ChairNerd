@@ -27,7 +27,8 @@ want to buy, and THEN filling out the buy form.
 >       self.assert_text("Ticket successfully bought", "#message")
 ```
 
-R1.2.3 and R1.2.5
+Error #2:
+R1.2.3 and R1.2.5: The final assert was checking for the text "Welcome test frontend!" despite us changing the text to "Hi test frontend!" Changing the test case code to match the desgin removed the failure
 ```
     @patch('qa327.backend.get_user', return_value=test_userR1)
     @patch('qa327.backend.get_all_tickets', return_value=test_ticketsR1)
@@ -59,7 +60,8 @@ R1.2.3 and R1.2.5
 >       self.assert_text("Welcome test frontend!", "#welcome-header")
 ```
 
-R1.2.6
+Error #3:
+R1.2.6: Some test case code was cut off before the last line, specifically the code typing in the password and clicking the submit button. Code checking the #welcome-header text was also missing. Replacing this code fixed the failure
 ```
     @patch('qa327.backend.get_user', return_value=test_userR1)
     @patch('qa327.backend.get_all_tickets', return_value=test_ticketsR1)
@@ -83,7 +85,8 @@ R1.2.6
 >       self.assert_element("#welcome-header")
 ```
 
-R1.2.1
+Error #4:
+R1.2.1: The final assert was checking for the text "Welcome test frontend!" despite us changing the text to "Hi test frontend!" Changing the test case code to match the desgin removed the failure
 ```
     @patch('qa327.backend.get_user', return_value=test_userR1)
     @patch('qa327.backend.get_all_tickets', return_value=test_ticketsR1)
@@ -106,7 +109,8 @@ R1.2.1
 >       self.assert_text("Welcome test frontend!", "#welcome-header")
 ```
 
-R1.1.3
+Error #5:
+R1.1.3: The final assert was checking for the text "Welcome test frontend!" despite us changing the text to "Hi test frontend!" Changing the test case code to match the desgin removed the failure
 ```
     @patch('qa327.backend.get_user', return_value=test_userR1)
     @patch('qa327.backend.get_all_tickets', return_value=test_ticketsR1)
@@ -128,7 +132,7 @@ R1.1.3
         self.assert_element("#welcome-header")
 >       self.assert_text("Welcome test frontend!", "#welcome-header")
 ```
-Error 61: 
+Error #6: 
 R3.11.1 : The ticket-update form can be posted to /update 
 The output was wrong because it was not posting "Ticket successfully updated" to /update.
 The reason it was doing this was because the ticket "Baby" did not exist. When this test was originally being 
