@@ -4,8 +4,7 @@ Error #1:
 R3.10.1 : The ticket-buying form can be posted to /buy
 The output was wrong because it was not posting "Ticket successfully bought" to /buy.
 The reason it was doing this was because the ticket "Test Show" did not exist. When this test was originally being 
-tested, "Test Show" was in the database so it did exist but after merging it with the other code, that database was erased. To fix this, the code was modified by filling the sell form out first with the ticket "Test Show" that I 
-want to buy, and THEN filling out the buy form.
+tested, "Test Show" was in the database so it did exist but after merging it with the other code, that database was erased. To fix this, the code was modified by filling the sell form out first with the ticket "Test Show" that I want to buy, and THEN filling out the buy form.
 
 ```
     @patch('qa327.backend.get_user', return_value=test_userR3)
@@ -136,8 +135,7 @@ Error #6:
 R3.11.1 : The ticket-update form can be posted to /update 
 The output was wrong because it was not posting "Ticket successfully updated" to /update.
 The reason it was doing this was because the ticket "Baby" did not exist. When this test was originally being 
-tested, "Baby" was in the database so it did exist but after merging it with the other code, that database was erased. To fix this, the code was modified by filling the sell form out first with the ticket "Baby" that I 
-want to sell, and THEN filling out the update form to udpate that ticket.
+tested, "Baby" was in the database so it did exist but after merging it with the other code, that database was erased. To fix this, the code was modified by filling the sell form out first with the ticket "Baby" that I want to sell, and THEN filling out the update form to update that ticket. 
 ```
     @patch('qa327.backend.get_user', return_value=test_userR3)
     def test_update_form_post(self, *_):
