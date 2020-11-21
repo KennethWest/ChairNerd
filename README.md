@@ -13,7 +13,8 @@
 - No temporary changes were made to the template to accomidate testing methods
 
 ### Backend Test: Black box systematic approach
-| Partition | email                 | input                      |
-|-----------|-----------------------|----------------------------|
-| Partition | email in database     | test_frontend@test.com     |
-| Partition | email not in database | not_test_frontend@test.com |
+Testing Partitions
+| Partition | email                 | input                       |
+|-----------|-----------------------|-----------------------------|
+| Partition | email in database     | test_frontendeee@test.com   |
+| Partition | email not in database | not_test_frontende@test.com |
