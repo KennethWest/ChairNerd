@@ -1,7 +1,7 @@
 # First check failures: #
 
 Error #1: 
-R3.10.1 : The ticket-buying form can be posted to /buy
+R3.10.1 : The ticket-buying form can be posted to /buy.
 The output was wrong because it was not posting "Ticket successfully bought" to /buy.
 The reason it was doing this was because the ticket "Test Show" did not exist. When this test was originally being 
 tested, "Test Show" was in the database so it did exist but after merging it with the other code, that database was erased. To fix this, the code was modified by filling the sell form out first with the ticket "Test Show" that I want to buy, and THEN filling out the buy form.
@@ -132,7 +132,7 @@ R1.1.3: The final assert was checking for the text "Welcome test frontend!" desp
 >       self.assert_text("Welcome test frontend!", "#welcome-header")
 ```
 Error #6: 
-R3.11.1 : The ticket-update form can be posted to /update 
+R3.11.1 : The ticket-update form can be posted to /update.
 The output was wrong because it was not posting "Ticket successfully updated" to /update.
 The reason it was doing this was because the ticket "Baby" did not exist. When this test was originally being 
 tested, "Baby" was in the database so it did exist but after merging it with the other code, that database was erased. To fix this, the code was modified by filling the sell form out first with the ticket "Baby" that I want to sell, and THEN filling out the update form to update that ticket. 
