@@ -102,7 +102,6 @@ class FrontEndHomePageTest(BaseCase):
         self.assert_element("#password")
         self.assert_element("#password2")
 
-    @patch('qa327.backend.register_user', return_value=test_userR2_to_register)
     def test_register_input_and_post(self, *_):
         """
         Test case R2.4.1
@@ -121,7 +120,6 @@ class FrontEndHomePageTest(BaseCase):
         assert self.get_current_url() == base_url + '/login'
         self.assert_text('Please login', "#message")
 
-    @patch('qa327.backend.register_user', return_value=test_userR2_to_register)
     def test_register_input_and_post_and_passwords_bad_no_spec_chars(self, *_):
         """
         Test case R2.5.1
@@ -141,7 +139,6 @@ class FrontEndHomePageTest(BaseCase):
         assert self.get_current_url() == base_url + '/login?message=Password+not+strong+enough'
         self.assert_text("Password not strong enough", '#message')
 
-    @patch('qa327.backend.register_user', return_value=test_userR2_to_register)
     def test_register_input_and_post_and_passwords_bad_no_caps(self, *_):
         """
         Test case R2.5.2
@@ -161,7 +158,6 @@ class FrontEndHomePageTest(BaseCase):
         # assert self.get_current_url() == base_url + '/login'
         self.assert_text("Password not strong enough", '#message')
 
-    @patch('qa327.backend.register_user', return_value=test_userR2_to_register)
     def test_register_input_and_post_and_passwords_bad_no_lower(self, *_):
         """
         Test case R2.5.3
@@ -180,7 +176,6 @@ class FrontEndHomePageTest(BaseCase):
         assert self.get_current_url() == base_url + '/login?message=Password+not+strong+enough'
         self.assert_text("Password not strong enough", '#message')
 
-    @patch('qa327.backend.register_user', return_value=test_userR2_to_register)
     def test_register_input_and_post_and_passwords_bad_short(self, *_):
         """
         Test case R2.5.4
@@ -217,7 +212,6 @@ class FrontEndHomePageTest(BaseCase):
         assert self.get_current_url() == base_url + '/login?message=Email+format+is+incorrect'
         self.assert_text("Email format is incorrect", '#message')
 
-    @patch('qa327.backend.register_user', return_value=test_userR2_to_register)
     def test_register_input_and_password_do_not_match(self, *_):
         """
         Test case R2.6.1
@@ -253,7 +247,6 @@ class FrontEndHomePageTest(BaseCase):
         self.click('input[type="submit"]')
         assert self.get_current_url() == base_url + '/login?message=Name+format+is+incorrect.'
         self.assert_text("Name format is incorrect.", '#message')
-
 
     def test_register_input_and_user_name_has_improper_space_in_beg(self, *_):
         """
@@ -327,7 +320,6 @@ class FrontEndHomePageTest(BaseCase):
         assert self.get_current_url() == base_url + '/login?message=Name+format+is+incorrect.'
         self.assert_text("Name format is incorrect.", '#message')
 
-
     def test_register_input_and_user_name_too_long(self, *_):
         """
         Test case R2.8.2
@@ -371,7 +363,6 @@ class FrontEndHomePageTest(BaseCase):
         self.click('input[type="submit"]')
         assert self.get_current_url() == base_url + '/login?message=this+email+has+been+ALREADY+used'
         self.assert_text("this email has been ALREADY used", '#message')
-
 
     def test_register_input_and_everything_works(self, *_):
         """
