@@ -47,17 +47,6 @@ test_userR3 = User(
     balance=5000
 )
 
-test_userR1 = User(
-    email='test_frontend@test.com',
-    name='test frontend',
-    password=generate_password_hash('Testfrontend#')
-)
-
-# Mock some sample tickets
-test_ticketsR1 = [
-    {'name': 't1', 'price': '100'}
-]
-
 # Moch some sample tickets
 test_ticketsR3 = [
     {'name': 't1', 'price': '100', 'quantity': '5', 'owner': 'test1@gmail.com'}
@@ -388,7 +377,7 @@ class FrontEndHomePageTest(BaseCase):
         # validate that we are on the correct profile page
         assert self.get_current_url() == base_url + '/'
         self.assert_text("Your balance is: $5000", "#balance-header")
-        
+
     def test_redirect_to_user_page_if_logged_in(self, *_):
         """
         Test case R2.1.1
@@ -460,7 +449,7 @@ class FrontEndHomePageTest(BaseCase):
         # validate that we are on the correct profile page
         assert self.get_current_url() == base_url + '/'
         self.assert_element("#welcome-header")
-        self.assert_text("Welcome test frontend!", "#welcome-header")
+        self.assert_text("Hi test frontend!", "#welcome-header")
         # reload the root page
         self.open(base_url + '/')
         # open /login
@@ -468,7 +457,7 @@ class FrontEndHomePageTest(BaseCase):
         # validate that we are on the correct profile page
         assert self.get_current_url() == base_url + '/'
         self.assert_element("#welcome-header")
-        self.assert_text("Welcome test frontend!", "#welcome-header")
+        self.assert_text("Hi test frontend!", "#welcome-header")
 
     def test_email_password_field_exists(self, *_):
         """
@@ -500,7 +489,7 @@ class FrontEndHomePageTest(BaseCase):
         # validate that we are on the correct profile page
         assert self.get_current_url() == base_url + '/'
         self.assert_element("#welcome-header")
-        self.assert_text("Welcome test frontend!", "#welcome-header")
+        self.assert_text("Hi test frontend!", "#welcome-header")
 
     @patch('qa327.backend.get_user', return_value=test_userR1)
     @patch('qa327.backend.get_all_tickets', return_value=test_ticketsR1)
@@ -545,7 +534,7 @@ class FrontEndHomePageTest(BaseCase):
         # validate that we are on the correct profile page
         assert self.get_current_url() == base_url + '/'
         self.assert_element("#welcome-header")
-        self.assert_text("Welcome test frontend!", "#welcome-header")
+        self.assert_text("Hi test frontend!", "#welcome-header")
 
     @patch('qa327.backend.get_user', return_value=test_userR1)
     @patch('qa327.backend.get_all_tickets', return_value=test_ticketsR1)
@@ -572,11 +561,11 @@ class FrontEndHomePageTest(BaseCase):
         # validate that we are on the correct profile page
         assert self.get_current_url() == base_url + '/'
         self.assert_element("#welcome-header")
-        self.assert_text("Welcome test frontend!", "#welcome-header")
+        self.assert_text("Hi test frontend!", "#welcome-header")
 
     @patch('qa327.backend.get_user', return_value=test_userR1)
     @patch('qa327.backend.get_all_tickets', return_value=test_ticketsR1)
-    def test_login_password_format(self, *_):
+    def test_login_password_and_email_format(self, *_):
         """
         Test case R1.2.6
         """
@@ -593,8 +582,13 @@ class FrontEndHomePageTest(BaseCase):
         self.assert_text('email/password combination incorrect', '#message')
         # enter correct credentials
         self.type('#email', 'test_frontend@test.com')
+        self.type('#password', 'Testfrontend#')
+        # click the log in button
+        self.click('input[type="submit"]')
+        # validate that we are on the correct profile page
+        assert self.get_current_url() == base_url + '/'
         self.assert_element("#welcome-header")
-        self.assert_text("Welcome test frontend!", "#welcome-header")
+        self.assert_text("Hi test frontend!", "#welcome-header")
         
     #################
     # R3 test cases #
@@ -733,7 +727,7 @@ class FrontEndHomePageTest(BaseCase):
         self.assert_element("#UpdateMsg")
         self.assert_text("Update ticket:", "#UpdateMsg")
         self.open(base_url + '/logout')
-    
+
     # R3.9.1: The ticket-selling form can be posted to /sell ###
     @patch('qa327.backend.get_user', return_value=test_userR3)
     def test_sell_form_post(self, *_):
