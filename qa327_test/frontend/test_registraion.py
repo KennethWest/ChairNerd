@@ -752,7 +752,7 @@ class FrontEndHomePageTest(BaseCase):
 
     # R3.10.1: The ticket-buying form can be posted to /buy ###
     @patch('qa327.backend.get_user', return_value=test_userR3)
-    def test_buy_form_post(self, *_):
+    def test_buy_formpost(self, *):
         self.open(base_url + '/logout')
         # open login page
         self.open(base_url + '/login')
@@ -762,7 +762,13 @@ class FrontEndHomePageTest(BaseCase):
         # click enter button
         self.click('input[type="submit"]')
         self.open(base_url)
-        self.type("#buy-name", "Test Show")
+        self.type("#sell-name", "Example")
+        self.type("#sell-quantity", "20")
+        self.type("#sell-price", "25")
+        self.type("#sell-expiry", "10/02/2020")
+        # click enter button
+        self.click('input[id="sell-submit"]')
+        self.type("#buy-name", "Example")
         self.type("#buy-quantity", "10")
         # click enter button
         self.click('input[id="buy-submit"]')
@@ -772,7 +778,7 @@ class FrontEndHomePageTest(BaseCase):
 
     # R3.11.1: The ticket-update form can be posted to /update ###
     @patch('qa327.backend.get_user', return_value=test_userR3)
-    def test_update_form_post(self, *_):
+    def test_update_formpost(self, *):
         self.open(base_url + '/logout')
         # open login page
         self.open(base_url + '/login')
@@ -782,10 +788,16 @@ class FrontEndHomePageTest(BaseCase):
         # click enter button
         self.click('input[type="submit"]')
         self.open(base_url)
-        self.type("#update-name", "Baby")
-        self.type("#update-quantity", "25")
-        self.type("#update-price", "30")
-        self.type("#update-expiry", '10/20/2020')
+        self.type("#sell-name", "Another example")
+        self.type("#sell-quantity", "20")
+        self.type("#sell-price", "25")
+        self.type("#sell-expiry", "10/02/2020")
+        # click enter button
+        self.click('input[id="sell-submit"]')
+        self.type("#update-name", "Another example")
+        self.type("#update-quantity", "10")
+        self.type("#update-price", "15")
+        self.type("#update-expiry", '10/25/2020')
         # click enter button
         self.click('input[id="update-submit"]')
         self.assert_element("#message")
