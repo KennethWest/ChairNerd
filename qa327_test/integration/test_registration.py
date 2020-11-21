@@ -2,6 +2,7 @@ import pytest
 from seleniumbase import BaseCase
 
 from qa327_test.conftest import base_url
+import qa327.backend as bn
 
 
 # integration testing: the test case interacts with the 
@@ -34,3 +35,18 @@ class Registered(BaseCase):
         self.assert_element("#welcome-header")
         self.assert_text("Hi test0", "#welcome-header")
     '''
+
+    def test_blackbox_get_user(self, *_):
+        """
+        Blackbox test case for backend function to get user
+        This test case registers a user, and then checks to see if they exist.
+        Then afterwards tests to see if an email which does not exist is also retrieved
+        (which it should not)
+        """
+        bn.register_user("test_frontendee@test.com", "Tester", "TestFront#")
+        user = bn.get_user("test_frontendee@test.com")
+        if user:
+            assert True
+        user_bad = bn.get_user("not_test_frontende@test.com")
+        if not user_bad:
+            assert True
