@@ -752,7 +752,7 @@ class FrontEndHomePageTest(BaseCase):
 
     # R3.10.1: The ticket-buying form can be posted to /buy ###
     @patch('qa327.backend.get_user', return_value=test_userR3)
-    def test_buy_formpost(self, *):
+    def test_buy_form_post(self, *_):
         self.open(base_url + '/logout')
         # open login page
         self.open(base_url + '/login')
@@ -778,7 +778,7 @@ class FrontEndHomePageTest(BaseCase):
 
     # R3.11.1: The ticket-update form can be posted to /update ###
     @patch('qa327.backend.get_user', return_value=test_userR3)
-    def test_update_formpost(self, *):
+    def test_update_form_post(self, *_):
         self.open(base_url + '/logout')
         # open login page
         self.open(base_url + '/login')
