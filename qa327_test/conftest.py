@@ -12,6 +12,7 @@ from werkzeug.serving import make_server
 
 base_url = 'http://localhost:{}'.format(FLASK_PORT)
 
+
 class ServerThread(threading.Thread):
 
     def __init__(self):
@@ -40,4 +41,3 @@ def server():
         yield
         server.shutdown()
         time.sleep(2)
-        
