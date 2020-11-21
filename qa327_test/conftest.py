@@ -4,8 +4,8 @@ import os
 import signal
 import time
 import tempfile
-from ChairNerd.qa327.__main__ import FLASK_PORT
-from ChairNerd.qa327.__main__ import app
+from qa327.__main__ import FLASK_PORT
+from qa327.__main__ import app
 import threading
 from werkzeug.serving import make_server
 

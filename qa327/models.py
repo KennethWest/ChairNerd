@@ -29,7 +29,7 @@ class Tickets(db.Model):
     price = db.Column(db.Float)
     quantity = db.Column(db.Integer)
     owner = db.Column(db.String(100))
-    expiry = db.Column(db.Date)
+    expiry = db.Column(db.String(100))
 
 
 # it creates all the SQL tables if they do not exist
