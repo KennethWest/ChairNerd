@@ -50,21 +50,43 @@ def authenticate(inner_function):
     # return the wrapped version of the inner_function:
     return wrapped_inner
 
-
+# R4:
 @app.route('/sell', methods=['POST'])
 def sell_post():
     name = request.form.get('name')
     quantity = int(request.form.get('quantity'))
     price = float(request.form.get('price'))
     expiry = request.form.get('expiry')
-    error_message = None
     email = session['logged_in']
     user = bn.get_user(email)
-    bn.create_ticket(name, quantity, price, expiry, email)
     tickets = bn.get_all_tickets()
-    error_message = "Ticket successfully posted to sell"
-    return render_template('index.html', message=error_message, user=user, tickets=tickets)
+    error_message = None
 
+    # checking to see if the ticket name is alphanumeric only, ignoring spaces for now
+    if name.replace(" ", "").isalnum() is False:
+        error_message = "The name of the ticket has to be alphanumeric-only (and spaces allowed only if not the " \
+                        "first or last character) "
+    # if name is alphanumeric disregarding spaces, now just ensure there are no spaces in the first or last character
+    elif name[0] == ' ' or name[len(name) - 1] == ' ':
+        error_message = "Space allowed only if it is not the first or last character"
+    elif len(name) > 60:
+        error_message = "The name of the ticket is no longer than 60 characters"
+    elif quantity <= 0 or quantity > 100:
+        error_message = "The quantity of tickets has to be more than 0 and less than or equal to 100"
+    elif price < 10 or price > 100:
+        error_message = "Price has to be between $10 and $100 (inclusive)"
+    else:
+        try:  # checking to see if the inputted expiry date is of proper format
+            expiry = datetime.strptime(expiry, "%Y/%m/%d").strftime('%Y/%m/%d')
+        except ValueError as e:
+            error_message = "Expiry date must be given in the format YYYY/MM/DD"
+
+    if error_message:
+        return render_template('index.html', message=error_message, user=user, tickets=tickets)
+    else:
+        bn.create_ticket(name, quantity, price, expiry, email)
+        tickets = bn.get_all_tickets()
+        return render_template('index.html', message="Ticket successfully posted to sell", user=user, tickets=tickets)
 
 '''
 @app.route('/sell', methods=['GET'])
