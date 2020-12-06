@@ -117,7 +117,7 @@ def buy_post():
         db.session.delete(ticket)
         db.session.commit()
     elif quantity > 100:
-        error_message = "We cannot supply that many tickets"
+        error_message = "We cannot supply that many tickets at once"
         db.session.delete(ticket)
         db.session.commit()
     elif quantity > ticket.quantity:
