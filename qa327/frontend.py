@@ -106,28 +106,16 @@ def buy_post():
     # check to see that the name is alphanumeric only and there is no space that is the first or last character
     if len(name) > 60 or len(name) < 1 or name[0] == " " or name[-1] == " " or not (name.replace(" ", "").isalnum()):
         error_message = "Name format is incorrect"
-        db.session.delete(ticket)
-        db.session.commit()
-    elif ticket is None:
-        error_message = "No tickets with that name"
-        db.session.delete(ticket)
-        db.session.commit()
     elif quantity < 1:
         error_message = "Not asking for any tickets"
-        db.session.delete(ticket)
-        db.session.commit()
     elif quantity > 100:
         error_message = "We cannot supply that many tickets at once"
-        db.session.delete(ticket)
-        db.session.commit()
+    elif ticket is None:
+        error_message = "No tickets with that name"
     elif quantity > ticket.quantity:
         error_message = "Not enough tickets available"
-        db.session.delete(ticket)
-        db.session.commit()
-    elif user.balance <= (ticket.price * quantity) + 0.35 * (ticket.price * quantity)  + 0.05 * (ticket.price * quantity) :
+    elif user.balance <= (ticket.price * quantity) + 0.35 * (ticket.price * quantity) + 0.05 * (ticket.price * quantity):
         error_message = "Not enough user balance"
-        db.session.delete(ticket)
-        db.session.commit()
     else:
         # check name, then quantitiy, exists in the database is already done, so do this stuff first
         newBalance = float(bn.get_user(email).balance) - (float(ticket.price) * quantity)
@@ -136,14 +124,13 @@ def buy_post():
         user.balance = newBalance
         db.session.commit()
         # tickets = bn.get_all_tickets()
-        # todo what to return if everything is successful
         # return render_template('index.html', message=error_message, user=user, tickets=tickets, balance=newBalance)
         quant = ticket.quantity - quantity
         ticket.quantity = quant
         user.balance = newBalance
         db.session.commit()
         error_message = "Ticket successfully bought"
-    return redirect(url_for('/', message=error_message))
+    return redirect(url_for('.profile', message=error_message))
 
 
 @app.route('/update', methods=['POST'])
@@ -357,7 +344,11 @@ def profile(user):
     # the login checking code all the time for other
     # front-end portals
     tickets = bn.get_all_tickets()
-    return render_template('index.html', user=user, tickets=tickets)
+    try:
+        message = request.args['message']
+    except:
+        message = ""
+    return render_template('index.html', user=user, tickets=tickets, message=message)
 
 @app.errorhandler(404)
 def not_found_404(error):
