@@ -188,26 +188,26 @@ def update_post():
     # check name for spaces at the beginning and end
     if (newName != ''):
         if (newName[0] == ' ') or (newName[len(newName) - 1] == ' '):
-                error_message = 'Error: Space allowed only if it is not the first or the last character'
-                return render_template('index.html', message=error_message, user=user, tickets=tickets)
+            error_message = 'Error: Space allowed only if it is not the first or the last character'
+            return render_template('index.html', message=error_message, user=user, tickets=tickets)
 
     # check length of name
     if (newName != ''):
         if len(newName) > 60:
-                error_message = 'Error: Ticket name must not have more than 60 characters'
-                return render_template('index.html', message=error_message, user=user, tickets=tickets)
+            error_message = 'Error: Ticket name must not have more than 60 characters'
+            return render_template('index.html', message=error_message, user=user, tickets=tickets)
 
     # check quantity of ticket
     if (quantity != ''):
-        if 1 > quantity > 100:
-                error_message = 'Error: Number of tickets must be between 1 and 100'
-                return render_template('index.html', message=error_message, user=user, tickets=tickets)
+        if 1 > quantity or quantity > 100:
+            error_message = 'Error: Number of tickets must be between 1 and 100'
+            return render_template('index.html', message=error_message, user=user, tickets=tickets)
 
     # check price of ticket
     if (price != ''):
-        if 10 > price > 100:
-                error_message = 'Error: Ticket price must be between 10 and 100 (inclusive)'
-                return render_template('index.html', message=error_message, user=user, tickets=tickets)
+        if 10 > price or price > 100:
+            error_message = 'Error: Ticket price must be between 10 and 100 (inclusive)'
+            return render_template('index.html', message=error_message, user=user, tickets=tickets)
 
     # check expiry date of ticket
     if (expiry != ''):
@@ -221,18 +221,18 @@ def update_post():
             if len(expiry) != 8:
                 expiry_valid = False
             # check for valid month
-            if 1 > expiry_month > 12:
+            if 1 > expiry_month or expiry_month > 12:
                 expiry_valid = False
             else:
                 # check for valid day
                 if expiry_month in [1, 3, 5, 7, 8, 10, 12]:  # if month is 31 days long
-                    if 1 > expiry_day > 31:
+                    if 1 > expiry_day or expiry_day > 31:
                         expiry_valid = False
                 elif expiry_month == 2: # if month is Feburary
-                    if 1 > expiry_day > 29: # assuming not leap year
+                    if 1 > expiry_day or expiry_day > 29: # assuming not leap year
                         expiry_valid = False
                 else: # if the month is 30 days long
-                    if 1 > expiry_day > 31:
+                    if 1 > expiry_day or expiry_day > 31:
                         expiry_valid = False
 
             # return the error if there was any
