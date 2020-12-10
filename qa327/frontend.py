@@ -50,21 +50,43 @@ def authenticate(inner_function):
     # return the wrapped version of the inner_function:
     return wrapped_inner
 
-
+# R4:
 @app.route('/sell', methods=['POST'])
 def sell_post():
     name = request.form.get('name')
     quantity = int(request.form.get('quantity'))
     price = float(request.form.get('price'))
     expiry = request.form.get('expiry')
-    error_message = None
     email = session['logged_in']
     user = bn.get_user(email)
-    bn.create_ticket(name, quantity, price, expiry, email)
     tickets = bn.get_all_tickets()
-    error_message = "Ticket successfully posted to sell"
-    return render_template('index.html', message=error_message, user=user, tickets=tickets)
+    error_message = None
 
+    # checking to see if the ticket name is alphanumeric only, ignoring spaces for now
+    if name.replace(" ", "").isalnum() is False:
+        error_message = "The name of the ticket has to be alphanumeric-only (and spaces allowed only if not the " \
+                        "first or last character) "
+    # if name is alphanumeric disregarding spaces, now just ensure there are no spaces in the first or last character
+    elif name[0] == ' ' or name[len(name) - 1] == ' ':
+        error_message = "Space allowed only if it is not the first or last character"
+    elif len(name) > 60:
+        error_message = "The name of the ticket is no longer than 60 characters"
+    elif quantity <= 0 or quantity > 100:
+        error_message = "The quantity of tickets has to be more than 0 and less than or equal to 100"
+    elif price < 10 or price > 100:
+        error_message = "Price has to be between $10 and $100 (inclusive)"
+    else:
+        try:  # checking to see if the inputted expiry date is of proper format
+            expiry = datetime.strptime(expiry, "%Y/%m/%d").strftime('%Y/%m/%d')
+        except ValueError as e:
+            error_message = "Expiry date must be given in the format YYYY/MM/DD"
+
+    if error_message:
+        return render_template('index.html', message=error_message, user=user, tickets=tickets)
+    else:
+        bn.create_ticket(name, quantity, price, expiry, email)
+        tickets = bn.get_all_tickets()
+        return render_template('index.html', message="Ticket successfully posted to sell", user=user, tickets=tickets)
 
 '''
 @app.route('/sell', methods=['GET'])
@@ -78,27 +100,50 @@ def buy_post():
     name = request.form.get('name')
     quantity = int(request.form.get('quantity'))
     error_message = None
-    ticket = Tickets.query.filter(Tickets.name == name).first()
     email = session['logged_in']
     user = bn.get_user(email)
-    tickets = bn.get_all_tickets()
-    if ticket is None:
+    ticket = Tickets.query.filter(Tickets.name == name).first()
+    # check to see that the name is alphanumeric only and there is no space that is the first or last character
+    if len(name) > 60 or len(name) < 1 or name[0] == " " or name[-1] == " " or not (name.replace(" ", "").isalnum()):
+        error_message = "Name format is incorrect"
+        db.session.delete(ticket)
+        db.session.commit()
+    elif ticket is None:
         error_message = "No tickets with that name"
+        db.session.delete(ticket)
+        db.session.commit()
+    elif quantity < 1:
+        error_message = "Not asking for any tickets"
+        db.session.delete(ticket)
+        db.session.commit()
+    elif quantity > 100:
+        error_message = "We cannot supply that many tickets"
+        db.session.delete(ticket)
+        db.session.commit()
+    elif quantity > ticket.quantity:
+        error_message = "Not enough tickets available"
+        db.session.delete(ticket)
+        db.session.commit()
+    elif user.balance <= (ticket.price * quantity) + 0.35 * (ticket.price * quantity)  + 0.05 * (ticket.price * quantity) :
+        error_message = "Not enough user balance"
+        db.session.delete(ticket)
+        db.session.commit()
     else:
+        # check name, then quantitiy, exists in the database is already done, so do this stuff first
         newBalance = float(bn.get_user(email).balance) - (float(ticket.price) * quantity)
-        if ticket.quantity <= quantity:
-            db.session.delete(ticket)
-            user.balance = newBalance
-            db.session.commit()
+        # if ticket.quantity <= quantity:
+        db.session.delete(ticket)
+        user.balance = newBalance
+        db.session.commit()
         # tickets = bn.get_all_tickets()
+        # todo what to return if everything is successful
         # return render_template('index.html', message=error_message, user=user, tickets=tickets, balance=newBalance)
-        else:
-            quant = ticket.quantity - quantity
-            ticket.quantity = quant
-            user.balance = newBalance
-            db.session.commit()
+        quant = ticket.quantity - quantity
+        ticket.quantity = quant
+        user.balance = newBalance
+        db.session.commit()
         error_message = "Ticket successfully bought"
-    return render_template('index.html', message=error_message, user=user, tickets=tickets)
+    return redirect(url_for('/', message=error_message))
 
 
 @app.route('/update', methods=['POST'])
@@ -116,15 +161,78 @@ def update_post():
     return render_template('index.html', message=error_message, user=user, tickets=tickets)
    '''
 
+    # initialize variables
+    error_message = None
     name = request.form.get('name')
     quantity = int(request.form.get('quantity'))
     price = float(request.form.get('price'))
     expiry = request.form.get('expiry')
-    error_message = None
     userTicket = Tickets.query.filter(Tickets.name == name).first()
     email = session['logged_in']
     user = bn.get_user(email)
     tickets = bn.get_all_tickets()
+
+    # check name for spaces at the beginning and end
+    if (name[0] == ' ') or (name[len(name) - 1] == ' '):
+            error_message = 'Error: Space allowed only if it is not the first or the last character'
+            return render_template('index.html', message=error_message, user=user, tickets=tickets)
+
+    # check length of name
+    if len(name) > 60:
+            error_message = 'Error: Ticket name must not have more than 60 characters'
+            return render_template('index.html', message=error_message, user=user, tickets=tickets)
+
+    # check quantity of ticket
+    if 1 > quantity > 100:
+            error_message = 'Error: Number of tickets must be between 1 and 100'
+            return render_template('index.html', message=error_message, user=user, tickets=tickets)
+
+    # check price of ticket
+    if 10 > price > 100:
+            error_message = 'Error: Ticket price must be between 10 and 100 (inclusive)'
+            return render_template('index.html', message=error_message, user=user, tickets=tickets)
+
+    # check expiry date of ticket
+    expiry_valid = True
+    try:
+        # check for any non int characters
+        expiry_year = int(expiry[0:4])
+        expiry_month = int(expiry[4:6])
+        expiry_day = int(expiry[6:8])
+        # check length
+        if len(expiry) != 8:
+            expiry_valid = False
+        # check for valid month
+        if 1 > expiry_month > 12:
+            expiry_valid = False
+        else:
+            # check for valid day
+            if expiry_month in [1, 3, 5, 7, 8, 10, 12]:  # if month is 31 days long
+                if 1 > expiry_day > 31:
+                    expiry_valid = False
+            elif expiry_month == 2: # if month is Feburary
+                if 1 > expiry_day > 29: # assuming not leap year
+                    expiry_valid = False
+            else: # if the month is 30 days long
+                if 1 > expiry_day > 31:
+                    expiry_valid = False
+
+        # return the error if there was any
+        if not expiry_valid:
+            error_message = 'Error: Date must be given in the format YYYYMMDD'
+            return render_template('index.html', message=error_message, user=user, tickets=tickets)
+
+    except:
+        error_message = 'Error: Date must be given in the format YYYYMMDD'
+        return render_template('index.html', message=error_message, user=user, tickets=tickets)
+
+    # check for special characters in the ticket name
+    special_chars = '@$!%*#?&'
+    for char in name:
+        if char in special_chars:
+            error_message = 'Error: The name of the ticket must be alphanumeric only'
+            return render_template('index.html', message=error_message, user=user, tickets=tickets)
+
     if userTicket is None:
         error_message = "No tickets with that name"
     else:
