@@ -52,13 +52,15 @@
 <form action="/update" method="post">
   <div class="form-group">
     <label for="update-name">Ticket name:</label>
-    <input class="form-control" name="name" id="update-name" required>
+    <input class="form-control" name="name-get" id="update-get-ticket" required>
+    <label for="update-name">New Ticket name:</label>
+    <input class="form-control" name="name" id="update-name">
     <label for="update-quantity">Quantity:</label>
-    <input class="form-control" name="quantity" id="update-quantity" required>
+    <input class="form-control" name="quantity" id="update-quantity">
     <label for="update-price">Price:</label>
-    <input class="form-control" name="price" id="update-price" required>
+    <input class="form-control" name="price" id="update-price">
     <label for="update-expiry">Expiry:</label>
-    <input class="form-control"  name="expiry" id="update-expiry" required>
+    <input class="form-control"  name="expiry" id="update-expiry">
     <input id = "update-submit" class="btn btn-primary" type="submit" value="Update">
   </div>
 </form>
