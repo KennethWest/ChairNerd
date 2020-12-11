@@ -11,6 +11,7 @@ from qa327_test.conftest import base_url
 from unittest.mock import patch
 from qa327.models import db, User
 from werkzeug.security import generate_password_hash, check_password_hash
+from qa327.backend import create_ticket
 
 """
 This file defines all unit tests for the frontend homepage.
@@ -27,7 +28,6 @@ the user from the database.
 Annotate @patch before unit tests can mock backend methods (for that testing function)
 """
 
-
 test_userR1 = User(
     email='test_frontend@test.com',
     name='test frontend',
@@ -36,7 +36,11 @@ test_userR1 = User(
 
 # Mock some sample tickets
 test_ticketsR1 = [
-    {'name': 't1', 'price': '100'}
+    {'name': 't1', 'price': '100', 'quantity': '3000'}
+]
+
+test_ticketsR2 = [
+    {'name': 't2', 'price': '100', 'quantity': '30'}
 ]
 
 # Moch a sample user
@@ -45,6 +49,12 @@ test_userR3 = User(
     name='test frontend',
     password=generate_password_hash('Testfrontend#'),
     balance=5000
+)
+test_userR4 = User(
+    email='test_frontend@test.com',
+    name='test frontend',
+    password=generate_password_hash('Testfrontend#'),
+    balance=5
 )
 
 # Moch some sample tickets
@@ -68,9 +78,10 @@ test_user_r7 = User(
     password=generate_password_hash('test_frontend')
 )
 
-class FrontEndHomePageTest(BaseCase):
 
+class FrontEndHomePageTest(BaseCase):
     """SHREY'S TESTS"""
+
     def test_register_route_works(self, *_):
         """
         Test case R2.2.1
@@ -133,7 +144,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type('#password2', 'Testfrontend')
         self.type('#name', 'test frontend')
         self.click('input[type="submit"]')
-        #print("hello")
+        # print("hello")
         assert self.get_current_url() == base_url + '/login?message=Password+not+strong+enough'
         self.assert_text("Password not strong enough", '#message')
 
@@ -377,7 +388,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type('#password2', 'Testfrontend#')
         self.type('#name', 'hello')
         self.click('input[type="submit"]')
-        self.open(base_url+'/login')
+        self.open(base_url + '/login')
         assert self.get_current_url() == base_url + '/login'
         self.type('#email', 'test_frontende@test.com')
         self.type('#password', 'Testfrontend#')
@@ -411,9 +422,9 @@ class FrontEndHomePageTest(BaseCase):
         self.assert_element("#welcome-header")
         self.assert_text("Welcome hello !", "#welcome-header")
 
-    #################
-    # R1 test cases #
-    #################
+    ################
+    # R6 test cases #
+    ################
     def test_login_redirect_from_base(self, *_):
         """
         Test case R1.1.1
@@ -598,7 +609,7 @@ class FrontEndHomePageTest(BaseCase):
         assert self.get_current_url() == base_url + '/'
         self.assert_element("#welcome-header")
         self.assert_text("Hi test frontend!", "#welcome-header")
-        
+
     #################
     # R3 test cases #
     #################
@@ -627,7 +638,6 @@ class FrontEndHomePageTest(BaseCase):
         self.assert_element("#welcome-header")
         self.assert_text("Hi test frontend!", "#welcome-header")
         self.open(base_url + '/logout')
-
 
     # R3.3.1: The page shows user balance
     @patch('qa327.backend.get_user', return_value=test_userR3)
@@ -814,7 +824,8 @@ class FrontEndHomePageTest(BaseCase):
         self.assert_text("Ticket successfully updated", "#message")
         self.open(base_url + '/logout')
 
-    #R7.1 : Logout will invalid the current session and redirect to the login page. After logout, the user shouldn't be able to access restricted pages.
+    # R7.1 : Logout will invalid the current session and redirect to the login page. After logout, the user shouldn't
+    # be able to access restricted pages.
     @patch('qa327.backend.get_user', return_value=test_user_r7)
     def test_logout_redirect_to_login(self, *_):
         self.open(base_url + '/logout')
@@ -828,7 +839,7 @@ class FrontEndHomePageTest(BaseCase):
         self.assert_element("#message")
         self.assert_text("Please login", "#message")
 
-    #R8.1 : For any other requests except /login, /register, /, /login, /buy, /sell, the system should return a 404 error
+    # R8.1 : For any other requests except /login, /register, /, /login, /buy, /sell, the system should return a 404
     def test_other_requests_are_404_errors(self, *_):
         self.open(base_url + '/logout')
         self.assert_no_404_errors()
@@ -841,6 +852,243 @@ class FrontEndHomePageTest(BaseCase):
         self.open(base_url + '/fake_domain')
         self.assert_element("#message")
         self.assert_text("Uh Oh! Something is not quite right here, maybe you tried to access a page you do not have access to or one that has recently been deleted.", "#message")
+
+    """""""""""""""
+    " R6 BUY POST "
+    """""""""""""""
+
+    # R6.1.1  Confirm the ticket name only has alphanumeric characters
+    @patch('qa327.backend.get_user', return_value=test_userR1)
+    def test_the_tickets_name_can_only_have_alphanumeric(self, *_):
+        # make sure we're logged out
+        self.open(base_url + '/logout')
+        # open /login
+        self.open(base_url + '/login')
+        # type in login info
+        self.type('#email', 'test_frontend@test.com')
+        self.type('#password', 'Testfrontend#')
+        # click the log in button
+        self.click('input[type="submit"]')
+        # validate that we are on the correct profile page
+        assert self.get_current_url() == base_url + '/'
+        self.assert_element("#welcome-header")
+        self.assert_text("Hi test frontend!", "#welcome-header")
+        self.type("#buy-name", "!!!!!!!!!!!")
+        self.type("#buy-quantity",  "5")
+        self.click('#buy-submit')
+        # assert self.get_current_url() == base_url + '/?message=Name+format+is+incorrect'
+        self.assert_element("#message")
+        self.assert_text("Name format is incorrect", "#message")
+
+    # R6.1.2  Confirm the ticket name does not have a space character as the first char
+    @patch('qa327.backend.get_user', return_value=test_userR1)
+    def test_the_tickets_name_can_not_have_space_as_first_char(self, *_):
+        # make sure we're logged out
+        self.open(base_url + '/logout')
+        # open /login
+        self.open(base_url + '/login')
+        # type in login info
+        self.type('#email', 'test_frontend@test.com')
+        self.type('#password', 'Testfrontend#')
+        # click the log in button
+        self.click('input[type="submit"]')
+        # validate that we are on the correct profile page
+        assert self.get_current_url() == base_url + '/'
+        self.assert_element("#welcome-header")
+        self.assert_text("Hi test frontend!", "#welcome-header")
+        self.type("#buy-name", " hello")
+        self.type("#buy-quantity",  "5")
+        self.click('#buy-submit')
+        assert self.get_current_url() == base_url + '/?message=Name+format+is+incorrect'
+        self.assert_element("#message")
+        self.assert_text("Name format is incorrect", "#message")
+
+    # R6.1.3  Confirm the ticket name cannot have a space character as the last char
+    @patch('qa327.backend.get_user', return_value=test_userR1)
+    def test_the_tickets_name_can_not_have_space_as_last_char(self, *_):
+        # make sure we're logged out
+        self.open(base_url + '/logout')
+        # open /login
+        self.open(base_url + '/login')
+        # type in login info
+        self.type('#email', 'test_frontend@test.com')
+        self.type('#password', 'Testfrontend#')
+        # click the log in button
+        self.click('input[type="submit"]')
+        # validate that we are on the correct profile page
+        assert self.get_current_url() == base_url + '/'
+        self.assert_element("#welcome-header")
+        self.assert_text("Hi test frontend!", "#welcome-header")
+        self.type("#buy-name", "hello ")
+        self.type("#buy-quantity", "5")
+        self.click('#buy-submit')
+        assert self.get_current_url() == base_url + '/?message=Name+format+is+incorrect'
+        self.assert_element("#message")
+        self.assert_text("Name format is incorrect", "#message")
+
+    # R6.2  Confirm the ticket name cannot be over 60 characters
+    @patch('qa327.backend.get_user', return_value=test_userR1)
+    def test_the_tickets_name_cannot_be_too_long(self, *_):
+        # make sure we're logged out
+        self.open(base_url + '/logout')
+        # open /login
+        self.open(base_url + '/login')
+        # type in login info
+        self.type('#email', 'test_frontend@test.com')
+        self.type('#password', 'Testfrontend#')
+        # click the log in button
+        self.click('input[type="submit"]')
+        # validate that we are on the correct profile page
+        assert self.get_current_url() == base_url + '/'
+        self.assert_element("#welcome-header")
+        self.assert_text("Hi test frontend!", "#welcome-header")
+        self.type("#buy-name", "this ticket name is waaaaayy too long to be honest definately over 60 characters")
+        self.type("#buy-quantity", "5")
+        self.click('#buy-submit')
+        assert self.get_current_url() == base_url + '/?message=Name+format+is+incorrect'
+        self.assert_element("#message")
+        self.assert_text("Name format is incorrect", "#message")
+
+    # R6.3.1 Confirm the ticket quantity to buy needs to be above 0
+    @patch('qa327.backend.get_user', return_value=test_userR1)
+    def test_the_tickets_quantity_has_to_be_over_0(self, *_):
+        # make sure we're logged out
+        self.open(base_url + '/logout')
+        # open /login
+        self.open(base_url + '/login')
+        # type in login info
+        self.type('#email', 'test_frontend@test.com')
+        self.type('#password', 'Testfrontend#')
+        # click the log in button
+        self.click('input[type="submit"]')
+        # validate that we are on the correct profile page
+        assert self.get_current_url() == base_url + '/'
+        self.assert_element("#welcome-header")
+        self.assert_text("Hi test frontend!", "#welcome-header")
+        self.type("#buy-name", "t1")
+        self.type("#buy-quantity", "-1")
+        self.click('#buy-submit')
+        assert self.get_current_url() == base_url + '/?message=Not+asking+for+any+tickets'
+        self.assert_element("#message")
+        self.assert_text("Not asking for any tickets", "#message")
+
+    # R6.3.2 Confirm the ticket quantity to buy needs to be less than 100
+    @patch('qa327.backend.get_user', return_value=test_userR1)
+    def test_the_tickets_quantity_has_to_be_less_than_100(self, *_):
+        # make sure we're logged out
+        self.open(base_url + '/logout')
+        # open /login
+        self.open(base_url + '/login')
+        # type in login info
+        self.type('#email', 'test_frontend@test.com')
+        self.type('#password', 'Testfrontend#')
+        # click the log in button
+        self.click('input[type="submit"]')
+        # validate that we are on the correct profile page
+        assert self.get_current_url() == base_url + '/'
+        self.assert_element("#welcome-header")
+        self.assert_text("Hi test frontend!", "#welcome-header")
+        self.type("#buy-name", "t1")
+        self.type("#buy-quantity", "10000")
+        self.click('#buy-submit')
+        assert self.get_current_url() == base_url + '/?message=We+cannot+supply+that+many+tickets+at+once'
+        self.assert_element("#message")
+        self.assert_text( "We cannot supply that many tickets at once", "#message")
+
+    # R6.4.1 Confirm what happens if the ticket does not exist
+    @patch('qa327.backend.get_user', return_value=test_userR1)
+    def test_the_tickets_if_no_name(self, *_):
+        # make sure we're logged out
+        self.open(base_url + '/logout')
+        # open /login
+        self.open(base_url + '/login')
+        # type in login info
+        self.type('#email', 'test_frontend@test.com')
+        self.type('#password', 'Testfrontend#')
+        # click the log in button
+        self.click('input[type="submit"]')
+        # validate that we are on the correct profile page
+        assert self.get_current_url() == base_url + '/'
+        self.assert_element("#welcome-header")
+        self.assert_text("Hi test frontend!", "#welcome-header")
+        self.type("#buy-name", "t2")
+        self.type("#buy-quantity", "50")
+        self.click('#buy-submit')
+        assert self.get_current_url() == base_url + '/?message=No+tickets+with+that+name'
+        self.assert_element("#message")
+        self.assert_text("No tickets with that name", "#message")
+
+    # R6.4.2 Confirm what happens if the quantity requested is more than what is available
+    @patch('qa327.backend.get_user', return_value=test_userR1)
+    def test_the_tickets_if_quantity_too_much(self, *_):
+        # make sure we're logged out
+        self.open(base_url + '/logout')
+        # open /login
+        self.open(base_url + '/login')
+        # type in login info
+        self.type('#email', 'test_frontend@test.com')
+        self.type('#password', 'Testfrontend#')
+        # click the log in button
+        self.click('input[type="submit"]')
+        # validate that we are on the correct profile page
+        create_ticket("t1", 10, 10, "2020/08/03", "Shrey")
+        assert self.get_current_url() == base_url + '/'
+        self.assert_element("#welcome-header")
+        self.assert_text("Hi test frontend!", "#welcome-header")
+        self.type("#buy-name", "t1")
+        self.type("#buy-quantity", "40")
+        self.click('#buy-submit')
+        assert self.get_current_url() == base_url + '/?message=Not+enough+tickets+available'
+        self.assert_element("#message")
+        self.assert_text("Not enough tickets available", "#message")
+
+    # R6.5 Confirm what happens if the user does not have enough balance to pay for the tickets
+    @patch('qa327.backend.get_user', return_value=test_userR4)
+    def test_the_tickets_if_not_enough_balance(self, *_):
+        # make sure we're logged out
+        self.open(base_url + '/logout')
+        # open /login
+        self.open(base_url + '/login')
+        # type in login info
+        self.type('#email', 'test_frontend@test.com')
+        self.type('#password', 'Testfrontend#')
+        # click the log in button
+        self.click('input[type="submit"]')
+        # validate that we are on the correct profile page
+        assert self.get_current_url() == base_url + '/'
+        create_ticket("t2", 10000000, 100000000, "2020/08/03", "Shrey")
+        self.assert_element("#welcome-header")
+        self.assert_text("Hi test frontend!", "#welcome-header")
+        self.type("#buy-name", "t2")
+        self.type("#buy-quantity", "10")
+        self.click('#buy-submit')
+        assert self.get_current_url() == base_url + '/?message=Not+enough+user+balance'
+        self.assert_element("#message")
+        self.assert_text("Not enough user balance", "#message",)
+
+    # R6.6 Confirm what happens if It works perfectly
+    @patch('qa327.backend.get_user', return_value=test_userR3)
+    def test_buy_successful(self, *_):
+        # make sure we're logged out
+        self.open(base_url + '/logout')
+        # open /login
+        self.open(base_url + '/login')
+        # type in login info
+        self.type('#email', 'test_frontend@test.com')
+        self.type('#password', 'Testfrontend#')
+        # click the log in button
+        self.click('input[type="submit"]')
+        # validate that we are on the correct profile page
+        assert self.get_current_url() == base_url + '/'
+        create_ticket("t3", 1000, 10, "2020/08/03", "Shrey")
+        self.assert_element("#welcome-header")
+        self.assert_text("Hi test frontend!", "#welcome-header")
+        self.type("#buy-name", "t3")
+        self.type("#buy-quantity", "40")
+        self.click('#buy-submit')
+        assert self.get_current_url() == base_url + '/?message=Ticket+successfully+bought'
+        self.assert_element("#message")
+        self.assert_text("Ticket successfully bought", "#message")
 
     #R5.1.1	Check if the updating actions succeed when the ticket name is alphanumeric-only
     @patch('qa327.backend.get_user', return_value=test_userR3)
