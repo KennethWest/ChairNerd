@@ -140,4 +140,4 @@ solved the issue
 FrontEndHomePageTest.test_selling_fails_invalid_ticket_price_gt_100
 FrontEndHomePageTest.test_selling_fails_invalid_ticket_price_lt_10
 FrontEndHomePageTest.test_selling_fails_ticket_invalid_name_length
-FrontEndHomePageTest.test_update_form_post
+FrontEndHomePageTest.test_update_form_post****
