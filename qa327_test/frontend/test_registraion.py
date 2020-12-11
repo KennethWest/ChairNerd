@@ -52,6 +52,15 @@ test_ticketsR3 = [
     {'name': 't1', 'price': '100', 'quantity': '5', 'owner': 'test1@gmail.com'}
 ]
 
+# Moch a sample user
+test_userR4 = User(
+    email='test_frontend@test.com',
+    name='test frontend',
+    password=generate_password_hash('Testfrontend#'),
+    balance=5000
+)
+
+
 # Mock a sample user
 test_user_r7 = User(
     email='test_frontend@test.com',
@@ -743,7 +752,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Test Show")
         self.type("#sell-quantity", "10")
         self.type("#sell-price", "25")
-        self.type("#sell-expiry", "10/02/2020")
+        self.type("#sell-expiry", "2020/10/02")
         # click enter button
         self.click('input[id="sell-submit"]')
         self.assert_element("#message")
@@ -765,7 +774,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Example")
         self.type("#sell-quantity", "20")
         self.type("#sell-price", "25")
-        self.type("#sell-expiry", "10/02/2020")
+        self.type("#sell-expiry", "2020/10/02")
         # click enter button
         self.click('input[id="sell-submit"]')
         self.type("#buy-name", "Example")
@@ -791,13 +800,13 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Another example")
         self.type("#sell-quantity", "20")
         self.type("#sell-price", "25")
-        self.type("#sell-expiry", "10/02/2020")
+        self.type("#sell-expiry", "2020/10/02")
         # click enter button
         self.click('input[id="sell-submit"]')
         self.type("#update-name", "Another example")
         self.type("#update-quantity", "10")
         self.type("#update-price", "15")
-        self.type("#update-expiry", '10/25/2020')
+        self.type("#update-expiry", '2020/10/25')
         # click enter button
         self.click('input[id="update-submit"]')
         self.assert_element("#message")
@@ -831,3 +840,370 @@ class FrontEndHomePageTest(BaseCase):
     	self.open(base_url + '/fake_domain')
     	self.assert_element("#message")
     	self.assert_text("Uh Oh! Something is not quite right here, maybe you tried to access a page you do not have access to or one that has recently been deleted.", "#message")
+
+    # R4.1.1: /sell[POST] Check if the selling actions succeed when the ticket name is alphanumeric-only**
+    @patch('qa327.backend.get_user', return_value=test_userR4)
+    def test_selling_succeeds_alphanumeric_only_ticket(self, *_):
+        self.open(base_url + '/logout')
+        # open login page
+        self.open(base_url + '/login')
+        # fill email and password
+        self.type("#email", "test_frontend@test.com")
+        self.type("#password", "Testfrontend#")
+        # click enter button
+        self.click('input[type="submit"]')
+        self.open(base_url)
+        self.type("#sell-name", "TestShow")
+        self.type("#sell-quantity", "10")
+        self.type("#sell-price", "25")
+        self.type("#sell-expiry", "2020/02/10")
+        # click enter button
+        self.click('input[id="sell-submit"]')
+        self.assert_element("#message")
+        self.assert_text("Ticket successfully posted to sell", "#message")
+        self.open(base_url + '/logout')
+
+    # R4.1.2: /sell[POST] Check if the selling actions fail when the ticket names contain special characters**
+    @patch('qa327.backend.get_user', return_value=test_userR4)
+    def test_selling_fails_special_characters_ticket(self, *_):
+        self.open(base_url + '/logout')
+        # open login page
+        self.open(base_url + '/login')
+        # fill email and password
+        self.type("#email", "test_frontend@test.com")
+        self.type("#password", "Testfrontend#")
+        # click enter button
+        self.click('input[type="submit"]')
+        self.open(base_url)
+        self.type("#sell-name", "TestShow:)")
+        self.type("#sell-quantity", "10")
+        self.type("#sell-price", "25")
+        self.type("#sell-expiry", "2020/02/10")
+        # click enter button
+        self.click('input[id="sell-submit"]')
+        assert self.get_current_url() == base_url + '/sell'
+        self.assert_element("#message")
+        self.assert_text("The name of the ticket has to be alphanumeric-only (and spaces allowed only if not the "
+                         "first or last character)", "#message")
+        self.open(base_url + '/logout')
+
+    # R4.1.3: /sell[POST] Check if the selling actions succeed when the ticket names contain a space that is not the first or last character**
+    @patch('qa327.backend.get_user', return_value=test_userR4)
+    def test_selling_succeeds_valid_space(self, *_):
+        self.open(base_url + '/logout')
+        # open login page
+        self.open(base_url + '/login')
+        # fill email and password
+        self.type("#email", "test_frontend@test.com")
+        self.type("#password", "Testfrontend#")
+        # click enter button
+        self.click('input[type="submit"]')
+        self.open(base_url)
+        self.type("#sell-name", "Test Show")
+        self.type("#sell-quantity", "10")
+        self.type("#sell-price", "25")
+        self.type("#sell-expiry", "2020/02/10")
+        # click enter button
+        self.click('input[id="sell-submit"]')
+        self.assert_element("#message")
+        self.assert_text("Ticket successfully posted to sell", "#message")
+        self.open(base_url + '/logout')
+
+    # R4.1.4: /sell[POST] Check if the selling actions fail when the ticket names contain a space as the first character, the last character, or both**
+    @patch('qa327.backend.get_user', return_value=test_userR4)
+    def test_selling_fails_invalid_space(self, *_):
+        self.open(base_url + '/logout')
+        # open login page
+        self.open(base_url + '/login')
+        # fill email and password
+        self.type("#email", "test_frontend@test.com")
+        self.type("#password", "Testfrontend#")
+        # click enter button
+        self.click('input[type="submit"]')
+        self.open(base_url)
+        self.type("#sell-name", " TestShow")
+        self.type("#sell-quantity", "10")
+        self.type("#sell-price", "25")
+        self.type("#sell-expiry", "2020/02/10")
+        # click enter button
+        self.click('input[id="sell-submit"]')
+        assert self.get_current_url() == base_url + '/sell'
+        self.assert_element("#message")
+        self.assert_text("Space allowed only if it is not the first or last character", "#message")
+        self.open(base_url + '/logout')
+
+    # R4.2.1: /sell[POST] Check if the selling actions succeed when the ticket name is less than 60 characters (but not empty) or exactly 60 characters**
+    @patch('qa327.backend.get_user', return_value=test_userR4)
+    def test_selling_succeeds_ticket_valid_name_length(self, *_):
+        self.open(base_url + '/logout')
+        # open login page
+        self.open(base_url + '/login')
+        # fill email and password
+        self.type("#email", "test_frontend@test.com")
+        self.type("#password", "Testfrontend#")
+        # click enter button
+        self.click('input[type="submit"]')
+        self.open(base_url)
+        self.type("#sell-name", "T")
+        self.type("#sell-quantity", "10")
+        self.type("#sell-price", "25")
+        self.type("#sell-expiry", "2020/02/10")
+        # click enter button
+        self.click('input[id="sell-submit"]')
+        self.assert_element("#message")
+        self.assert_text("Ticket successfully posted to sell", "#message")
+        self.open(base_url + '/logout')
+
+    # R4.2.2: /sell[POST] Check if the selling actions fail when the ticket name is more than 60 characters, or zero characters (empty)**
+    @patch('qa327.backend.get_user', return_value=test_userR4)
+    def test_selling_fails_ticket_invalid_name_length(self, *_):
+        self.open(base_url + '/logout')
+        # open login page
+        self.open(base_url + '/login')
+        # fill email and password
+        self.type("#email", "test_frontend@test.com")
+        self.type("#password", "Testfrontend#")
+        # click enter button
+        self.click('input[type="submit"]')
+        self.open(base_url)
+        self.type("#sell-name", "Very long name that is more than 60 characters surely much longer")
+        self.type("#sell-quantity", "10")
+        self.type("#sell-price", "25")
+        self.type("#sell-expiry", "2020/02/10")
+        # click enter button
+        self.click('input[id="sell-submit"]')
+        assert self.get_current_url() == base_url + '/sell'
+        self.assert_element("#message")
+        self.assert_text("The name of the ticket can be no longer than 60 characters", "#message")
+        self.open(base_url + '/logout')
+
+    # R4.3.1: /sell[POST] Check if the selling actions succeed when the quantity of the tickets is between 1 and 100 (inclusive)**
+    @patch('qa327.backend.get_user', return_value=test_userR4)
+    def test_selling_succeeds_valid_ticket_quantity(self, *_):
+        self.open(base_url + '/logout')
+        # open login page
+        self.open(base_url + '/login')
+        # fill email and password
+        self.type("#email", "test_frontend@test.com")
+        self.type("#password", "Testfrontend#")
+        # click enter button
+        self.click('input[type="submit"]')
+        self.open(base_url)
+        self.type("#sell-name", "Test")
+        self.type("#sell-quantity", "10")
+        self.type("#sell-price", "25")
+        self.type("#sell-expiry", "2020/02/10")
+        # click enter button
+        self.click('input[id="sell-submit"]')
+        self.assert_element("#message")
+        self.assert_text("Ticket successfully posted to sell", "#message")
+        self.open(base_url + '/logout')
+
+    # R4.3.2: /sell[POST] Check if the selling actions fail when the quantity of tickets is over 100, is zero, or is negative**
+    @patch('qa327.backend.get_user', return_value=test_userR4)
+    def test_selling_fails_ticket_quantity_gt_100(self, *_):
+        self.open(base_url + '/logout')
+        # open login page
+        self.open(base_url + '/login')
+        # fill email and password
+        self.type("#email", "test_frontend@test.com")
+        self.type("#password", "Testfrontend#")
+        # click enter button
+        self.click('input[type="submit"]')
+        self.open(base_url)
+        self.type("#sell-name", "Test")
+        self.type("#sell-quantity", "105")
+        self.type("#sell-price", "25")
+        self.type("#sell-expiry", "2020/02/10")
+        # click enter button
+        self.click('input[id="sell-submit"]')
+        assert self.get_current_url() == base_url + '/sell'
+        self.assert_element("#message")
+        self.assert_text("The quantity of tickets has to be more than 0 and less than or equal to 100", "#message")
+        self.open(base_url + '/logout')
+
+    # R4.3.2: /sell[POST] Check if the selling actions fail when the quantity of tickets is over 100, is zero, or is negative**
+    @patch('qa327.backend.get_user', return_value=test_userR4)
+    def test_selling_fails_ticket_quantity_zero(self, *_):
+        self.open(base_url + '/logout')
+        # open login page
+        self.open(base_url + '/login')
+        # fill email and password
+        self.type("#email", "test_frontend@test.com")
+        self.type("#password", "Testfrontend#")
+        # click enter button
+        self.click('input[type="submit"]')
+        self.open(base_url)
+        self.type("#sell-name", "Test")
+        self.type("#sell-quantity", "0")
+        self.type("#sell-price", "25")
+        self.type("#sell-expiry", "2020/02/10")
+        # click enter button
+        self.click('input[id="sell-submit"]')
+        assert self.get_current_url() == base_url + '/sell'
+        self.assert_element("#message")
+        self.assert_text("The quantity of tickets has to be more than 0 and less than or equal to 100", "#message")
+        self.open(base_url + '/logout')
+
+    # R4.3.2: /sell[POST] Check if the selling actions fail when the quantity of tickets is over 100, is zero, or is negative**
+    @patch('qa327.backend.get_user', return_value=test_userR4)
+    def test_selling_fails_ticket_quantity_negative(self, *_):
+        self.open(base_url + '/logout')
+        # open login page
+        self.open(base_url + '/login')
+        # fill email and password
+        self.type("#email", "test_frontend@test.com")
+        self.type("#password", "Testfrontend#")
+        # click enter button
+        self.click('input[type="submit"]')
+        self.open(base_url)
+        self.type("#sell-name", "Test")
+        self.type("#sell-quantity", "-10")
+        self.type("#sell-price", "25")
+        self.type("#sell-expiry", "2020/02/10")
+        # click enter button
+        self.click('input[id="sell-submit"]')
+        assert self.get_current_url() == base_url + '/sell'
+        self.assert_element("#message")
+        self.assert_text("The quantity of tickets has to be more than 0 and less than or equal to 100", "#message")
+        self.open(base_url + '/logout')
+
+    # R4.4.1: /sell[POST] Check if the selling actions succeed when the price of a ticket is between 10 and 100 (inclusive)**
+    @patch('qa327.backend.get_user', return_value=test_userR4)
+    def test_selling_succeeds_valid_ticket_price(self, *_):
+        self.open(base_url + '/logout')
+        # open login page
+        self.open(base_url + '/login')
+        # fill email and password
+        self.type("#email", "test_frontend@test.com")
+        self.type("#password", "Testfrontend#")
+        # click enter button
+        self.click('input[type="submit"]')
+        self.open(base_url)
+        self.type("#sell-name", "Test")
+        self.type("#sell-quantity", "10")
+        self.type("#sell-price", "10")
+        self.type("#sell-expiry", "2020/02/10")
+        # click enter button
+        self.click('input[id="sell-submit"]')
+        self.assert_element("#message")
+        self.assert_text("Ticket successfully posted to sell", "#message")
+        self.open(base_url + '/logout')
+
+    # R4.4.2: /sell[POST] Check if the selling actions fail when the price of a ticket is less than 10, or over 100**
+    @patch('qa327.backend.get_user', return_value=test_userR4)
+    def test_selling_fails_invalid_ticket_price_lt_10(self, *_):
+        self.open(base_url + '/logout')
+        # open login page
+        self.open(base_url + '/login')
+        # fill email and password
+        self.type("#email", "test_frontend@test.com")
+        self.type("#password", "Testfrontend#")
+        # click enter button
+        self.click('input[type="submit"]')
+        self.open(base_url)
+        self.type("#sell-name", "Test")
+        self.type("#sell-quantity", "10")
+        self.type("#sell-price", "9")
+        self.type("#sell-expiry", "2020/02/10")
+        # click enter button
+        self.click('input[id="sell-submit"]')
+        assert self.get_current_url() == base_url + '/sell'
+        self.assert_element("#message")
+        self.assert_text("The ticket price has to be between $10 and $100 (inclusive)", "#message")
+        self.open(base_url + '/logout')
+
+    # R4.4.2: /sell[POST] Check if the selling actions fail when the price of a ticket is less than 10, or over 100**
+    @patch('qa327.backend.get_user', return_value=test_userR4)
+    def test_selling_fails_invalid_ticket_price_gt_100(self, *_):
+        self.open(base_url + '/logout')
+        # open login page
+        self.open(base_url + '/login')
+        # fill email and password
+        self.type("#email", "test_frontend@test.com")
+        self.type("#password", "Testfrontend#")
+        # click enter button
+        self.click('input[type="submit"]')
+        self.open(base_url)
+        self.type("#sell-name", "Test")
+        self.type("#sell-quantity", "10")
+        self.type("#sell-price", "101")
+        self.type("#sell-expiry", "2020/02/10")
+        # click enter button
+        self.click('input[id="sell-submit"]')
+        assert self.get_current_url() == base_url + '/sell'
+        self.assert_element("#message")
+        self.assert_text("The ticket price has to be between $10 and $100 (inclusive)", "#message")
+        self.open(base_url + '/logout')
+
+    # R4.5.1: /sell[POST] Check if the selling actions succeed when the date is in the format YYYYMMDD**
+    @patch('qa327.backend.get_user', return_value=test_userR4)
+    def test_selling_succeeds_valid_date_format(self, *_):
+        self.open(base_url + '/logout')
+        # open login page
+        self.open(base_url + '/login')
+        # fill email and password
+        self.type("#email", "test_frontend@test.com")
+        self.type("#password", "Testfrontend#")
+        # click enter button
+        self.click('input[type="submit"]')
+        self.open(base_url)
+        self.type("#sell-name", "Testing")
+        self.type("#sell-quantity", "10")
+        self.type("#sell-price", "15")
+        self.type("#sell-expiry", "2020/02/10")
+        # click enter button
+        self.click('input[id="sell-submit"]')
+        self.assert_element("#message")
+        self.assert_text("Ticket successfully posted to sell", "#message")
+        self.open(base_url + '/logout')
+
+    # R4.5.2: /sell[POST] Check if the selling actions fail when the date is in any other format (YYMMDD, YYYYMMD, YYYYDDMM, MMDDYYYY, DDMMYYYY etc)**
+    @patch('qa327.backend.get_user', return_value=test_userR4)
+    def test_selling_fails_invalid_date_format(self, *_):
+        self.open(base_url + '/logout')
+        # open login page
+        self.open(base_url + '/login')
+        # fill email and password
+        self.type("#email", "test_frontend@test.com")
+        self.type("#password", "Testfrontend#")
+        # click enter button
+        self.click('input[type="submit"]')
+        self.open(base_url)
+        self.type("#sell-name", "Testing")
+        self.type("#sell-quantity", "10")
+        self.type("#sell-price", "15")
+        self.type("#sell-expiry", "10/02/2020")
+        # click enter button
+        self.click('input[id="sell-submit"]')
+        assert self.get_current_url() == base_url + '/sell'
+        self.assert_element("#message")
+        self.assert_text("Expiry date must be given in the format YYYY/MM/DD", "#message")
+        self.open(base_url + '/logout')
+
+    # R4.6.1 and R4.6.2 have been incorporated into all of the test cases above for R4, for clarity and efficiency
+
+    # R4.7.1: /sell[POST] The added new ticket information will be posted on the user profile page**
+    @patch('qa327.backend.get_user', return_value=test_userR4)
+    def test_new_ticket_info_posted(self, *_):
+        self.open(base_url + '/logout')
+        # open login page
+        self.open(base_url + '/login')
+        # fill email and password
+        self.type("#email", "test_frontend@test.com")
+        self.type("#password", "Testfrontend#")
+        # click enter button
+        self.click('input[type="submit"]')
+        self.open(base_url)
+        self.type("#sell-name", "Good ticket")
+        self.type("#sell-quantity", "10")
+        self.type("#sell-price", "15")
+        self.type("#sell-expiry", "2020/02/10")
+        # click enter button
+        self.click('input[id="sell-submit"]')
+        self.assert_element("#message")
+        self.assert_text("Ticket successfully posted to sell", "#message")
+        self.assert_element("#tickets")
+        self.assert_text("Good ticket 15.0 10 test_frontend@test.com 2020/02/10", "#tickets")
+        self.open(base_url + '/logout')
+
