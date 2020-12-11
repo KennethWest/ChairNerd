@@ -36,17 +36,17 @@ class Registered(BaseCase):
         self.assert_text("Hi test0", "#welcome-header")
     '''
 
-    def test_blackbox_get_user(self, *_):
-        """
-        Blackbox test case for backend function to get user
-        This test case registers a user, and then checks to see if they exist.
-        Then afterwards tests to see if an email which does not exist is also retrieved
-        (which it should not)
-        """
-        bn.register_user("test_frontendeee@test.com", "Tester", "TestFront#")
-        user = bn.get_user("test_frontendeee@test.com")
-        if user:
-            assert True
-        user_bad = bn.get_user("not_test_frontende@test.com")
-        if not user_bad:
-            assert True
+    # def test_blackbox_get_user(self, *_):
+    #     """
+    #     Blackbox test case for backend function to get user
+    #     This test case registers a user, and then checks to see if they exist.
+    #     Then afterwards tests to see if an email which does not exist is also retrieved
+    #     (which it should not)
+    #     """
+    #     bn.register_user("test_frontendeee@test.com", "Tester", "TestFront#")
+    #     user = bn.get_user("test_frontendeee@test.com")
+    #     if user:
+    #         assert True
+    #     user_bad = bn.get_user("not_test_frontende@test.com")
+    #     if not user_bad:
+    #         assert True
