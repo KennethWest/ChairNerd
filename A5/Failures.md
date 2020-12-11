@@ -8,6 +8,9 @@
 | #4           | test_update_date_fails              | R5.5.2        | ""                  | ""                        | ""                                                                                                                                       |
 | #5           | test_update_price_gt_100_fails      | R5.4.2        | ""                  | ""                        | ""                                                                                                                                       |
 | #6           | test_update_price_lt_10_fails       | R5.4.2        | ""                  | ""                        | ""                                                                                                                                       |
+| #7           | test_selling_fails_invalid_ticket_price_lt_10       | R4.4.2        | The message that was printed was different from what was asserted                  | The message that was supposed to be printed was updated in the frontend, but that change was mistakenly not pushed                     | Pushed the updated frontend changes                                                                                                                                       |
+
+
 
 Error #1-6: 
 R5.3.2, R5.5.4, R5.4.2.
