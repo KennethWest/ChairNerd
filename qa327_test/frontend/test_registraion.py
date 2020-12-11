@@ -752,7 +752,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Test Show")
         self.type("#sell-quantity", "10")
         self.type("#sell-price", "25")
-        self.type("#sell-expiry", "10/02/2020")
+        self.type("#sell-expiry", "2020/10/02")
         # click enter button
         self.click('input[id="sell-submit"]')
         self.assert_element("#message")
@@ -774,7 +774,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Example")
         self.type("#sell-quantity", "20")
         self.type("#sell-price", "25")
-        self.type("#sell-expiry", "10/02/2020")
+        self.type("#sell-expiry", "2020/10/02")
         # click enter button
         self.click('input[id="sell-submit"]')
         self.type("#buy-name", "Example")
@@ -800,13 +800,13 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Another example")
         self.type("#sell-quantity", "20")
         self.type("#sell-price", "25")
-        self.type("#sell-expiry", "10/02/2020")
+        self.type("#sell-expiry", "2020/10/02")
         # click enter button
         self.click('input[id="sell-submit"]')
         self.type("#update-name", "Another example")
         self.type("#update-quantity", "10")
         self.type("#update-price", "15")
-        self.type("#update-expiry", '10/25/2020')
+        self.type("#update-expiry", '2020/10/25')
         # click enter button
         self.click('input[id="update-submit"]')
         self.assert_element("#message")
