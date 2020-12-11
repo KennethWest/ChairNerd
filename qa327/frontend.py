@@ -70,11 +70,11 @@ def sell_post():
     elif name[0] == ' ' or name[len(name) - 1] == ' ':
         error_message = "Space allowed only if it is not the first or last character"
     elif len(name) > 60:
-        error_message = "The name of the ticket is no longer than 60 characters"
+        error_message = "The name of the ticket can be no longer than 60 characters"
     elif quantity <= 0 or quantity > 100:
         error_message = "The quantity of tickets has to be more than 0 and less than or equal to 100"
     elif price < 10 or price > 100:
-        error_message = "Price has to be between $10 and $100 (inclusive)"
+        error_message = "The ticket price has to be between $10 and $100 (inclusive)"
     else:
         try:  # checking to see if the inputted expiry date is of proper format
             expiry = datetime.strptime(expiry, "%Y/%m/%d").strftime('%Y/%m/%d')

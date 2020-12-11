@@ -50,12 +50,6 @@ test_userR3 = User(
     password=generate_password_hash('Testfrontend#'),
     balance=5000
 )
-test_userR4 = User(
-    email='test_frontend@test.com',
-    name='test frontend',
-    password=generate_password_hash('Testfrontend#'),
-    balance=5
-)
 
 # Moch some sample tickets
 test_ticketsR3 = [
@@ -80,8 +74,8 @@ test_user_r7 = User(
 
 
 class FrontEndHomePageTest(BaseCase):
-    """SHREY'S TESTS"""
 
+    """SHREY'S TESTS"""
     def test_register_route_works(self, *_):
         """
         Test case R2.2.1
@@ -817,7 +811,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#update-name", "Another example")
         self.type("#update-quantity", "10")
         self.type("#update-price", "15")
-        self.type("#update-expiry", '2020/10/25')
+        self.type("#update-expiry", '20201025')
         # click enter button
         self.click('input[id="update-submit"]')
         self.assert_element("#message")
