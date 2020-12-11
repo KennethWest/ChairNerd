@@ -3,6 +3,7 @@ from seleniumbase import BaseCase
 
 from qa327_test.conftest import base_url
 import qa327.backend as bn
+from qa327.backend import create_ticket
 from unittest.mock import patch
 from qa327.models import db, User
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -80,3 +81,41 @@ class Registered(BaseCase):
         # click the log in button
         self.click('input[type="submit"]')
         # enter in the sell info
+        self.type('#sell-name', 'IntegrationTicket')
+        self.type('#sell-quantity', '20')
+        self.type('#sell-price', '25')
+        self.type('#sell-expiry', '2020/02/10')
+        # click enter button
+        self.click('input[id="sell-submit"]')
+        # check if the posting worked
+        self.assert_element("#tickets")
+        # this is sufficient since we have other test cases which confirm that having this message means it works
+        self.assert_text("Ticket successfully posted to sell", "#message")
+        # logout
+        self.click('a[id="#logout"]')
+        # check if we are on /login
+        assert self.get_current_url() == base_url + '/login'
+
+
+    @patch('qa327.backend.get_user', return_value=test_user_integration)
+    def test_integration_2(self, *_):
+        # create the ticket manually
+        create_ticket("IntegrationTicket2", 20, 25, "2020/02/10", "test frontend")
+        # make sure we're logged out
+        self.open(base_url + '/logout')
+        # open /login
+        self.open(base_url + '/login')
+        # type in login info
+        self.type('#email', 'test_frontend@test.com')
+        self.type('#password', 'Testfrontend#')
+        # click the log in button
+        self.click('input[type="submit"]')
+        self.type("#buy-name", "IntegrationTicket2")
+        self.type("#buy-quantity", "5")
+        self.click('#buy-submit')
+        self.assert_text("Ticket successfully bought", "#message")
+        # logout
+        self.click('a[id="#logout"]')
+        # check if we are on /login
+        assert self.get_current_url() == base_url + '/login'
+
