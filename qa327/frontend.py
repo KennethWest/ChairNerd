@@ -163,87 +163,106 @@ def update_post():
 
     # initialize variables
     error_message = None
-    name = request.form.get('name')
-    quantity = int(request.form.get('quantity'))
-    price = float(request.form.get('price'))
+    name = request.form.get('name-get')
+    newName = request.form.get('name')
+    getQuantity = request.form.get('quantity')
+    if (getQuantity != ''):
+        quantity = int(getQuantity)
+    else:
+        quantity = ''
+    getPrice = request.form.get('price')
+    if (getPrice != ''):
+        price = float(getPrice)
+    else:
+        price = ''
     expiry = request.form.get('expiry')
-    userTicket = Tickets.query.filter(Tickets.name == name).first()
     email = session['logged_in']
+    userTicket = Tickets.query.filter(Tickets.name == name and Tickets.owner == email).first()
     user = bn.get_user(email)
     tickets = bn.get_all_tickets()
 
+    if userTicket is None:
+        error_message = "No tickets with that name"
+        return render_template('index.html', message=error_message, user=user, tickets=tickets)
+
     # check name for spaces at the beginning and end
-    if (name[0] == ' ') or (name[len(name) - 1] == ' '):
+    if (newName != ''):
+        if (newName[0] == ' ') or (newName[len(newName) - 1] == ' '):
             error_message = 'Error: Space allowed only if it is not the first or the last character'
             return render_template('index.html', message=error_message, user=user, tickets=tickets)
 
     # check length of name
-    if len(name) > 60:
+    if (newName != ''):
+        if len(newName) > 60:
             error_message = 'Error: Ticket name must not have more than 60 characters'
             return render_template('index.html', message=error_message, user=user, tickets=tickets)
 
     # check quantity of ticket
-    if 1 > quantity > 100:
+    if (quantity != ''):
+        if 1 > quantity or quantity > 100:
             error_message = 'Error: Number of tickets must be between 1 and 100'
             return render_template('index.html', message=error_message, user=user, tickets=tickets)
 
     # check price of ticket
-    if 10 > price > 100:
+    if (price != ''):
+        if 10 > price or price > 100:
             error_message = 'Error: Ticket price must be between 10 and 100 (inclusive)'
             return render_template('index.html', message=error_message, user=user, tickets=tickets)
 
     # check expiry date of ticket
-    expiry_valid = True
-    try:
-        # check for any non int characters
-        expiry_year = int(expiry[0:4])
-        expiry_month = int(expiry[4:6])
-        expiry_day = int(expiry[6:8])
-        # check length
-        if len(expiry) != 8:
-            expiry_valid = False
-        # check for valid month
-        if 1 > expiry_month > 12:
-            expiry_valid = False
-        else:
-            # check for valid day
-            if expiry_month in [1, 3, 5, 7, 8, 10, 12]:  # if month is 31 days long
-                if 1 > expiry_day > 31:
-                    expiry_valid = False
-            elif expiry_month == 2: # if month is Feburary
-                if 1 > expiry_day > 29: # assuming not leap year
-                    expiry_valid = False
-            else: # if the month is 30 days long
-                if 1 > expiry_day > 31:
-                    expiry_valid = False
+    if (expiry != ''):
+        expiry_valid = True
+        try:
+            # check for any non int characters
+            expiry_year = int(expiry[0:4])
+            expiry_month = int(expiry[4:6])
+            expiry_day = int(expiry[6:8])
+            # check length
+            if len(expiry) != 8:
+                expiry_valid = False
+            # check for valid month
+            if 1 > expiry_month or expiry_month > 12:
+                expiry_valid = False
+            else:
+                # check for valid day
+                if expiry_month in [1, 3, 5, 7, 8, 10, 12]:  # if month is 31 days long
+                    if 1 > expiry_day or expiry_day > 31:
+                        expiry_valid = False
+                elif expiry_month == 2: # if month is Feburary
+                    if 1 > expiry_day or expiry_day > 29: # assuming not leap year
+                        expiry_valid = False
+                else: # if the month is 30 days long
+                    if 1 > expiry_day or expiry_day > 31:
+                        expiry_valid = False
 
-        # return the error if there was any
-        if not expiry_valid:
+            # return the error if there was any
+            if not expiry_valid:
+                error_message = 'Error: Date must be given in the format YYYYMMDD'
+                return render_template('index.html', message=error_message, user=user, tickets=tickets)
+
+        except:
             error_message = 'Error: Date must be given in the format YYYYMMDD'
             return render_template('index.html', message=error_message, user=user, tickets=tickets)
 
-    except:
-        error_message = 'Error: Date must be given in the format YYYYMMDD'
-        return render_template('index.html', message=error_message, user=user, tickets=tickets)
-
     # check for special characters in the ticket name
-    special_chars = '@$!%*#?&'
-    for char in name:
-        if char in special_chars:
-            error_message = 'Error: The name of the ticket must be alphanumeric only'
-            return render_template('index.html', message=error_message, user=user, tickets=tickets)
-
-    if userTicket is None:
-        error_message = "No tickets with that name"
-    else:
-        #date = datetime.strptime(expiry, '%Y/%m/%d')
-        #x = expiry.split('/')
-        #date = datetime.datetime(x[0], x[1], x[2])
+    if (newName != ''):
+        for char in newName:
+            if char == ' ':
+                continue
+            if not char.isalnum():
+                error_message = 'Error: The name of the ticket must be alphanumeric only'
+                return render_template('index.html', message=error_message, user=user, tickets=tickets)
+    
+    if (newName != ''):
+        userTicket.name = newName
+    if (quantity != ''):
         userTicket.quantity = quantity
+    if (price != ''):
         userTicket.price = price
+    if (expiry != ''):
         userTicket.expiry = expiry
-        db.session.commit()
-        error_message = "Ticket successfully updated"
+    db.session.commit()
+    error_message = "Ticket successfully updated"
     return render_template('index.html', message=error_message, user=user, tickets=tickets)
 
 @app.route('/register', methods=['POST'])
