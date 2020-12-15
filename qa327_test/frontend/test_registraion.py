@@ -148,8 +148,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type('#name', 'test frontend')
         self.click('input[type="submit"]')
         # print("hello")
-        assert self.get_current_url() == base_url + '/login?message=Password+not+strong+enough+-+must+have+minimum' \
-                                                    '+length+6,+at+least+one+upper+case,+at+least+one+lower+case,+and+at+least+one+special+character'
+        assert self.get_current_url() == base_url + '/login?message=Password+not+strong+enough'
         self.assert_text("Password not strong enough - must have minimum length 6, at least one upper case, at least " \
                         "one lower case, and at least one special character", '#message')
 
@@ -168,7 +167,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type('#password2', 'testfrontend#')
         self.type('#name', 'test frontend')
         self.click('input[type="submit"]')
-        assert self.get_current_url() == base_url + '/login?message=Password+not+strong+enough+-+must+have+minimum+length+6,+at+least+one+upper+case,+at+least+one+lower+case,+and+at+least+one+special+character'
+        assert self.get_current_url() == base_url + '/login?message=Password+not+strong+enough'
         # assert self.get_current_url() == base_url + '/login'
         self.assert_text("Password not strong enough - must have minimum length 6, at least one upper case, at least " \
                         "one lower case, and at least one special character", '#message')
@@ -188,7 +187,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type('#password2', 'TESTFRONTEND#')
         self.type('#name', 'test frontend')
         self.click('input[type="submit"]')
-        assert self.get_current_url() == base_url + '/login?message=Password+not+strong+enough+-+must+have+minimum+length+6,+at+least+one+upper+case,+at+least+one+lower+case,+and+at+least+one+special+character'
+        assert self.get_current_url() == base_url + '/login?message=Password+not+strong+enough'
         self.assert_text("Password not strong enough - must have minimum length 6, at least one upper case, at least " \
                         "one lower case, and at least one special character", '#message')
 
@@ -207,7 +206,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type('#password2', 'Te#')
         self.type('#name', 'test frontend')
         self.click('input[type="submit"]')
-        assert self.get_current_url() == base_url + '/login?message=Password+not+strong+enough+-+must+have+minimum+length+6,+at+least+one+upper+case,+at+least+one+lower+case,+and+at+least+one+special+character'
+        assert self.get_current_url() == base_url + '/login?message=Password+not+strong+enough'
         self.assert_text("Password not strong enough - must have minimum length 6, at least one upper case, at least " \
                         "one lower case, and at least one special character", '#message')
 
@@ -262,7 +261,6 @@ class FrontEndHomePageTest(BaseCase):
         self.type('#password2', 'Testfrontend#')
         self.type('#name', ' ')
         self.click('input[type="submit"]')
-        assert self.get_current_url() == base_url + '/login?message=Name+format+is+incorrect.+User+name+has+to+be+non-empty,+longer+than+2+characters+and+less+than+20+characters,+alphanumeric-only,+and+space+allowed+only+if+it+is+not+the+first+or+the+last+character'
         self.assert_text("Name format is incorrect. User name has to be non-empty, longer than 2 characters and less " \
                         "than 20 characters, alphanumeric-only, and space allowed only if it is not the first or the " \
                         "last character", '#message')
@@ -282,7 +280,6 @@ class FrontEndHomePageTest(BaseCase):
         self.type('#password2', 'Testfrontend#')
         self.type('#name', ' hello')
         self.click('input[type="submit"]')
-        assert self.get_current_url() == base_url + '/login?message=Name+format+is+incorrect.+User+name+has+to+be+non-empty,+longer+than+2+characters+and+less+than+20+characters,+alphanumeric-only,+and+space+allowed+only+if+it+is+not+the+first+or+the+last+character'
         self.assert_text("Name format is incorrect. User name has to be non-empty, longer than 2 characters and less " \
                         "than 20 characters, alphanumeric-only, and space allowed only if it is not the first or the " \
                         "last character", '#message')
@@ -302,7 +299,6 @@ class FrontEndHomePageTest(BaseCase):
         self.type('#password2', 'Testfrontend#')
         self.type('#name', 'hello ')
         self.click('input[type="submit"]')
-        assert self.get_current_url() == base_url + '/login?message=Name+format+is+incorrect.+User+name+has+to+be+non-empty,+longer+than+2+characters+and+less+than+20+characters,+alphanumeric-only,+and+space+allowed+only+if+it+is+not+the+first+or+the+last+character'
         self.assert_text("Name format is incorrect. User name has to be non-empty, longer than 2 characters and less " \
                         "than 20 characters, alphanumeric-only, and space allowed only if it is not the first or the " \
                         "last character", '#message')
@@ -322,7 +318,6 @@ class FrontEndHomePageTest(BaseCase):
         self.type('#password2', 'Testfrontend#')
         self.type('#name', 'hel@lo')
         self.click('input[type="submit"]')
-        assert self.get_current_url() == base_url + '/login?message=Name+format+is+incorrect.+User+name+has+to+be+non-empty,+longer+than+2+characters+and+less+than+20+characters,+alphanumeric-only,+and+space+allowed+only+if+it+is+not+the+first+or+the+last+character'
         self.assert_text("Name format is incorrect. User name has to be non-empty, longer than 2 characters and less " \
                         "than 20 characters, alphanumeric-only, and space allowed only if it is not the first or the " \
                         "last character", '#message')
@@ -342,7 +337,6 @@ class FrontEndHomePageTest(BaseCase):
         self.type('#password2', 'Testfrontend#')
         self.type('#name', 'h')
         self.click('input[type="submit"]')
-        assert self.get_current_url() == base_url + '/login?message=Name+format+is+incorrect.+User+name+has+to+be+non-empty,+longer+than+2+characters+and+less+than+20+characters,+alphanumeric-only,+and+space+allowed+only+if+it+is+not+the+first+or+the+last+character'
         self.assert_text("Name format is incorrect. User name has to be non-empty, longer than 2 characters and less " \
                         "than 20 characters, alphanumeric-only, and space allowed only if it is not the first or the " \
                         "last character", '#message')
@@ -362,7 +356,6 @@ class FrontEndHomePageTest(BaseCase):
         self.type('#password2', 'Testfrontend#')
         self.type('#name', 'thisusernameismorethantwentycharacterslong')
         self.click('input[type="submit"]')
-        assert self.get_current_url() == base_url + '/login?message=Name+format+is+incorrect.+User+name+has+to+be+non-empty,+longer+than+2+characters+and+less+than+20+characters,+alphanumeric-only,+and+space+allowed+only+if+it+is+not+the+first+or+the+last+character'
         self.assert_text("Name format is incorrect. User name has to be non-empty, longer than 2 characters and less " \
                         "than 20 characters, alphanumeric-only, and space allowed only if it is not the first or the " \
                         "last character", '#message')
