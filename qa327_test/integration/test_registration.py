@@ -40,7 +40,7 @@ class Registered(BaseCase):
         self.assert_element("#welcome-header")
         self.assert_text("Hi test0", "#welcome-header")
     '''
-
+    '''
     def test_blackbox_get_user(self, *_):
         """
         Blackbox test case for backend function to get user
@@ -58,7 +58,7 @@ class Registered(BaseCase):
         user_bad = bn.get_user("not_test_frontende@test.com")
         if not user_bad:
             assert True
-
+    '''
     test_user_integration = User(
         email='test_frontend@test.com',
         name='test frontend',
@@ -84,7 +84,7 @@ class Registered(BaseCase):
         self.type('#sell-name', 'IntegrationTicket')
         self.type('#sell-quantity', '20')
         self.type('#sell-price', '25')
-        self.type('#sell-expiry', '2020/02/10')
+        self.type('#sell-expiry', '20210315')
         # click enter button
         self.click('input[id="sell-submit"]')
         # check if the posting worked
@@ -100,7 +100,7 @@ class Registered(BaseCase):
     @patch('qa327.backend.get_user', return_value=test_user_integration)
     def test_integration_2(self, *_):
         # create the ticket manually
-        create_ticket("IntegrationTicket2", 20, 25, "2020/02/10", "test frontend")
+        create_ticket("IntegrationTicket2", 20, 25, "20210210", "test frontend")
         # make sure we're logged out
         self.open(base_url + '/logout')
         # open /login
