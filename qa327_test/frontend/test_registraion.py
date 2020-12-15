@@ -147,8 +147,6 @@ class FrontEndHomePageTest(BaseCase):
         self.type('#password2', 'Testfrontend')
         self.type('#name', 'test frontend')
         self.click('input[type="submit"]')
-        # print("hello")
-        assert self.get_current_url() == base_url + '/login?message=Password+not+strong+enough'
         self.assert_text("Password not strong enough - must have minimum length 6, at least one upper case, at least " \
                         "one lower case, and at least one special character", '#message')
 
@@ -167,7 +165,6 @@ class FrontEndHomePageTest(BaseCase):
         self.type('#password2', 'testfrontend#')
         self.type('#name', 'test frontend')
         self.click('input[type="submit"]')
-        assert self.get_current_url() == base_url + '/login?message=Password+not+strong+enough'
         # assert self.get_current_url() == base_url + '/login'
         self.assert_text("Password not strong enough - must have minimum length 6, at least one upper case, at least " \
                         "one lower case, and at least one special character", '#message')
@@ -187,7 +184,6 @@ class FrontEndHomePageTest(BaseCase):
         self.type('#password2', 'TESTFRONTEND#')
         self.type('#name', 'test frontend')
         self.click('input[type="submit"]')
-        assert self.get_current_url() == base_url + '/login?message=Password+not+strong+enough'
         self.assert_text("Password not strong enough - must have minimum length 6, at least one upper case, at least " \
                         "one lower case, and at least one special character", '#message')
 
@@ -206,7 +202,6 @@ class FrontEndHomePageTest(BaseCase):
         self.type('#password2', 'Te#')
         self.type('#name', 'test frontend')
         self.click('input[type="submit"]')
-        assert self.get_current_url() == base_url + '/login?message=Password+not+strong+enough'
         self.assert_text("Password not strong enough - must have minimum length 6, at least one upper case, at least " \
                         "one lower case, and at least one special character", '#message')
 
