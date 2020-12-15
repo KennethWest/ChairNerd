@@ -5,24 +5,45 @@
 {% endblock %}
 
 {% block content %}
-<h4 id='message'>{{message}}</h4>
+<h4 style="color: #74F3EB" id='message'> {{ message }}</h4>
+
+
 <h2 id="welcome-header">Hi {{ user.name }}!</h2>
 
-<h5 id="balance-header">Your balance is: ${{ user.balance }}</h5>
+<h5 id="balance-header">Your balance is: ${{ user.balance }} </h5>
 
-<h2 id="avail-tickets">Here are all available tickets</h2>
+<h2 id="avail-tickets">Here are all available tickets:</h2>
 
 <div id="tickets">
-{% for ticket in tickets %}
-    <div>
-        <h4>{{ ticket.name }} {{ ticket.price }} {{ ticket.quantity }} {{ ticket.owner }} {{ ticket.expiry }}</h4>
+  <table>
+    <tr>
+      <th>Name</th>
+      <th>Price</th>
+      <th>Quantity</th>
+      <th>Owner</th>
+      <th>Expiry (YYYYMMDD)</th>
+    </tr>
 
-    </div>
+{% for ticket in tickets %}
+    <tr>
+      <td>{{ ticket.name }}</td>
+      <td>${{ ticket.price }}</td>
+      <td>{{ ticket.quantity }}</td>
+      <td>{{ ticket.owner }}</td>
+      <td>{{ ticket.expiry }}</td>
+    </tr>
+
+
+<!--    <div>-->
+<!--        <h4>{{ ticket.name }} {{ ticket.price }} {{ ticket.quantity }} {{ ticket.owner }} {{ ticket.expiry }}</h4>-->
+
+<!--    </div>-->
 {% endfor %}
+    </table>
 </div>
 
 
-<h3 id="SellMsg"> Sell tickets: </h3>
+<h3 id="SellMsg"><u> Sell tickets: </u></h3>
 <form action="/sell" method="post">
   <div class="form-group">
     <label for="sell-name">Name:</label>
@@ -37,7 +58,7 @@
   </div>
 </form>
 
-<h3 id="BuyMsg"> Buy tickets: </h3>
+<h3 id="BuyMsg"><u> Buy tickets: </u></h3>
 <form action="/buy" method="post">
   <div class="form-group">
     <label for="buy-name">Ticket name:</label>
@@ -48,7 +69,7 @@
   </div>
 </form>
 
-<h3 id="UpdateMsg"> Update ticket: </h3>
+<h3 id="UpdateMsg"><u> Update ticket: </u></h3>
 <form action="/update" method="post">
   <div class="form-group">
     <label for="update-name">Ticket name:</label>

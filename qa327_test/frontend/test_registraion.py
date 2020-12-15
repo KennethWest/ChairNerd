@@ -31,13 +31,22 @@ Annotate @patch before unit tests can mock backend methods (for that testing fun
 test_userR1 = User(
     email='test_frontend@test.com',
     name='test frontend',
-    password=generate_password_hash('Testfrontend#')
+    password=generate_password_hash('Testfrontend#'),
+    balance=5000
 )
 
 # Mock some sample tickets
 test_ticketsR1 = [
     {'name': 't1', 'price': '100', 'quantity': '3000'}
 ]
+
+test_userR2 = User(
+    email='test_frontend@test.com',
+    name='test frontend',
+    password=generate_password_hash('Testfrontend#'),
+    balance=5000
+)
+
 
 test_ticketsR2 = [
     {'name': 't2', 'price': '100', 'quantity': '30'}
@@ -115,7 +124,7 @@ class FrontEndHomePageTest(BaseCase):
         self.open(base_url + '/register')
         # validate that the user is taken to /login
         assert self.get_current_url() == base_url + '/register'
-        self.type('#email', 'test_frontend@test.com')
+        self.type('#email', '2542568test_frontend@test.com')
         self.type('#password', 'Testfrontend#')
         self.type('#password2', 'Testfrontend#')
         self.type('#name', 'test frontend')
@@ -139,8 +148,10 @@ class FrontEndHomePageTest(BaseCase):
         self.type('#name', 'test frontend')
         self.click('input[type="submit"]')
         # print("hello")
-        assert self.get_current_url() == base_url + '/login?message=Password+not+strong+enough'
-        self.assert_text("Password not strong enough", '#message')
+        assert self.get_current_url() == base_url + '/login?message=Password+not+strong+enough+-+must+have+minimum' \
+                                                    '+length+6,+at+least+one+upper+case,+at+least+one+lower+case,+and+at+least+one+special+character'
+        self.assert_text("Password not strong enough - must have minimum length 6, at least one upper case, at least " \
+                        "one lower case, and at least one special character", '#message')
 
     def test_register_input_and_post_and_passwords_bad_no_caps(self, *_):
         """
@@ -157,9 +168,10 @@ class FrontEndHomePageTest(BaseCase):
         self.type('#password2', 'testfrontend#')
         self.type('#name', 'test frontend')
         self.click('input[type="submit"]')
-        assert self.get_current_url() == base_url + '/login?message=Password+not+strong+enough'
+        assert self.get_current_url() == base_url + '/login?message=Password+not+strong+enough+-+must+have+minimum+length+6,+at+least+one+upper+case,+at+least+one+lower+case,+and+at+least+one+special+character'
         # assert self.get_current_url() == base_url + '/login'
-        self.assert_text("Password not strong enough", '#message')
+        self.assert_text("Password not strong enough - must have minimum length 6, at least one upper case, at least " \
+                        "one lower case, and at least one special character", '#message')
 
     def test_register_input_and_post_and_passwords_bad_no_lower(self, *_):
         """
@@ -176,8 +188,9 @@ class FrontEndHomePageTest(BaseCase):
         self.type('#password2', 'TESTFRONTEND#')
         self.type('#name', 'test frontend')
         self.click('input[type="submit"]')
-        assert self.get_current_url() == base_url + '/login?message=Password+not+strong+enough'
-        self.assert_text("Password not strong enough", '#message')
+        assert self.get_current_url() == base_url + '/login?message=Password+not+strong+enough+-+must+have+minimum+length+6,+at+least+one+upper+case,+at+least+one+lower+case,+and+at+least+one+special+character'
+        self.assert_text("Password not strong enough - must have minimum length 6, at least one upper case, at least " \
+                        "one lower case, and at least one special character", '#message')
 
     def test_register_input_and_post_and_passwords_bad_short(self, *_):
         """
@@ -194,8 +207,9 @@ class FrontEndHomePageTest(BaseCase):
         self.type('#password2', 'Te#')
         self.type('#name', 'test frontend')
         self.click('input[type="submit"]')
-        assert self.get_current_url() == base_url + '/login?message=Password+not+strong+enough'
-        self.assert_text("Password not strong enough", '#message')
+        assert self.get_current_url() == base_url + '/login?message=Password+not+strong+enough+-+must+have+minimum+length+6,+at+least+one+upper+case,+at+least+one+lower+case,+and+at+least+one+special+character'
+        self.assert_text("Password not strong enough - must have minimum length 6, at least one upper case, at least " \
+                        "one lower case, and at least one special character", '#message')
 
     def test_register_input_and_post_and_email_bad(self, *_):
         """
@@ -248,8 +262,10 @@ class FrontEndHomePageTest(BaseCase):
         self.type('#password2', 'Testfrontend#')
         self.type('#name', ' ')
         self.click('input[type="submit"]')
-        assert self.get_current_url() == base_url + '/login?message=Name+format+is+incorrect.'
-        self.assert_text("Name format is incorrect.", '#message')
+        assert self.get_current_url() == base_url + '/login?message=Name+format+is+incorrect.+User+name+has+to+be+non-empty,+longer+than+2+characters+and+less+than+20+characters,+alphanumeric-only,+and+space+allowed+only+if+it+is+not+the+first+or+the+last+character'
+        self.assert_text("Name format is incorrect. User name has to be non-empty, longer than 2 characters and less " \
+                        "than 20 characters, alphanumeric-only, and space allowed only if it is not the first or the " \
+                        "last character", '#message')
 
     def test_register_input_and_user_name_has_improper_space_in_beg(self, *_):
         """
@@ -266,8 +282,10 @@ class FrontEndHomePageTest(BaseCase):
         self.type('#password2', 'Testfrontend#')
         self.type('#name', ' hello')
         self.click('input[type="submit"]')
-        assert self.get_current_url() == base_url + '/login?message=Name+format+is+incorrect.'
-        self.assert_text("Name format is incorrect.", '#message')
+        assert self.get_current_url() == base_url + '/login?message=Name+format+is+incorrect.+User+name+has+to+be+non-empty,+longer+than+2+characters+and+less+than+20+characters,+alphanumeric-only,+and+space+allowed+only+if+it+is+not+the+first+or+the+last+character'
+        self.assert_text("Name format is incorrect. User name has to be non-empty, longer than 2 characters and less " \
+                        "than 20 characters, alphanumeric-only, and space allowed only if it is not the first or the " \
+                        "last character", '#message')
 
     def test_register_input_and_user_name_has_improper_space_in_end(self, *_):
         """
@@ -284,8 +302,10 @@ class FrontEndHomePageTest(BaseCase):
         self.type('#password2', 'Testfrontend#')
         self.type('#name', 'hello ')
         self.click('input[type="submit"]')
-        assert self.get_current_url() == base_url + '/login?message=Name+format+is+incorrect.'
-        self.assert_text("Name format is incorrect.", '#message')
+        assert self.get_current_url() == base_url + '/login?message=Name+format+is+incorrect.+User+name+has+to+be+non-empty,+longer+than+2+characters+and+less+than+20+characters,+alphanumeric-only,+and+space+allowed+only+if+it+is+not+the+first+or+the+last+character'
+        self.assert_text("Name format is incorrect. User name has to be non-empty, longer than 2 characters and less " \
+                        "than 20 characters, alphanumeric-only, and space allowed only if it is not the first or the " \
+                        "last character", '#message')
 
     def test_register_input_and_user_name_has_non_alphanumeric(self, *_):
         """
@@ -302,8 +322,10 @@ class FrontEndHomePageTest(BaseCase):
         self.type('#password2', 'Testfrontend#')
         self.type('#name', 'hel@lo')
         self.click('input[type="submit"]')
-        assert self.get_current_url() == base_url + '/login?message=Name+format+is+incorrect.'
-        self.assert_text("Name format is incorrect.", '#message')
+        assert self.get_current_url() == base_url + '/login?message=Name+format+is+incorrect.+User+name+has+to+be+non-empty,+longer+than+2+characters+and+less+than+20+characters,+alphanumeric-only,+and+space+allowed+only+if+it+is+not+the+first+or+the+last+character'
+        self.assert_text("Name format is incorrect. User name has to be non-empty, longer than 2 characters and less " \
+                        "than 20 characters, alphanumeric-only, and space allowed only if it is not the first or the " \
+                        "last character", '#message')
 
     def test_register_input_and_user_name_too_short(self, *_):
         """
@@ -320,8 +342,10 @@ class FrontEndHomePageTest(BaseCase):
         self.type('#password2', 'Testfrontend#')
         self.type('#name', 'h')
         self.click('input[type="submit"]')
-        assert self.get_current_url() == base_url + '/login?message=Name+format+is+incorrect.'
-        self.assert_text("Name format is incorrect.", '#message')
+        assert self.get_current_url() == base_url + '/login?message=Name+format+is+incorrect.+User+name+has+to+be+non-empty,+longer+than+2+characters+and+less+than+20+characters,+alphanumeric-only,+and+space+allowed+only+if+it+is+not+the+first+or+the+last+character'
+        self.assert_text("Name format is incorrect. User name has to be non-empty, longer than 2 characters and less " \
+                        "than 20 characters, alphanumeric-only, and space allowed only if it is not the first or the " \
+                        "last character", '#message')
 
     def test_register_input_and_user_name_too_long(self, *_):
         """
@@ -338,8 +362,10 @@ class FrontEndHomePageTest(BaseCase):
         self.type('#password2', 'Testfrontend#')
         self.type('#name', 'thisusernameismorethantwentycharacterslong')
         self.click('input[type="submit"]')
-        assert self.get_current_url() == base_url + '/login?message=Name+format+is+incorrect.'
-        self.assert_text("Name format is incorrect.", '#message')
+        assert self.get_current_url() == base_url + '/login?message=Name+format+is+incorrect.+User+name+has+to+be+non-empty,+longer+than+2+characters+and+less+than+20+characters,+alphanumeric-only,+and+space+allowed+only+if+it+is+not+the+first+or+the+last+character'
+        self.assert_text("Name format is incorrect. User name has to be non-empty, longer than 2 characters and less " \
+                        "than 20 characters, alphanumeric-only, and space allowed only if it is not the first or the " \
+                        "last character", '#message')
 
     def test_register_input_and_email_already_used(self, *_):
         """
@@ -364,8 +390,8 @@ class FrontEndHomePageTest(BaseCase):
         self.type('#password2', 'Testfrontend#')
         self.type('#name', 'hello')
         self.click('input[type="submit"]')
-        assert self.get_current_url() == base_url + '/login?message=this+email+has+been+ALREADY+used'
-        self.assert_text("this email has been ALREADY used", '#message')
+        assert self.get_current_url() == base_url + '/login?message=This+email+has+been+ALREADY+used'
+        self.assert_text("This email has been ALREADY used", '#message')
 
     def test_register_input_and_everything_works(self, *_):
         """
@@ -683,9 +709,9 @@ class FrontEndHomePageTest(BaseCase):
         self.click('input[type="submit"]')
         self.open(base_url)
         self.assert_element("#avail-tickets")
-        self.assert_text("Here are all available tickets", "#avail-tickets")
+        self.assert_text("Here are all available tickets:", "#avail-tickets")
         self.assert_element("#tickets")
-        self.assert_text("t1 100 5 test1@gmail.com", "#tickets")
+        self.assert_text("t1 $100 5 test1@gmail.com", "#tickets")
         self.open(base_url + '/logout')
 
     # R3.6.1: The page contains a form that a user can submit new tickets to sell (includes name, quantity, price,
@@ -756,7 +782,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Test Show")
         self.type("#sell-quantity", "10")
         self.type("#sell-price", "25")
-        self.type("#sell-expiry", "2020/10/02")
+        self.type("#sell-expiry", "20210204")
         # click enter button
         self.click('input[id="sell-submit"]')
         self.assert_element("#message")
@@ -778,7 +804,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Example")
         self.type("#sell-quantity", "20")
         self.type("#sell-price", "25")
-        self.type("#sell-expiry", "2020/10/02")
+        self.type("#sell-expiry", "20210204")
         # click enter button
         self.click('input[id="sell-submit"]')
         self.type("#buy-name", "Example")
@@ -804,14 +830,14 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Another example")
         self.type("#sell-quantity", "20")
         self.type("#sell-price", "25")
-        self.type("#sell-expiry", "2020/10/02")
+        self.type("#sell-expiry", "20210204")
         # click enter button
         self.click('input[id="sell-submit"]')
         self.type("#update-get-ticket", "Another example")
         self.type("#update-name", "Another example")
         self.type("#update-quantity", "10")
         self.type("#update-price", "15")
-        self.type("#update-expiry", '20201025')
+        self.type("#update-expiry", '20210205')
         # click enter button
         self.click('input[id="update-submit"]')
         self.assert_element("#message")
@@ -835,14 +861,6 @@ class FrontEndHomePageTest(BaseCase):
 
     # R8.1 : For any other requests except /login, /register, /, /login, /buy, /sell, the system should return a 404
     def test_other_requests_are_404_errors(self, *_):
-        self.open(base_url + '/logout')
-        self.assert_no_404_errors()
-        self.open(base_url)
-        self.assert_no_404_errors()
-        self.open(base_url + '/login')
-        self.assert_no_404_errors()
-        self.open(base_url + '/register')
-        self.assert_no_404_errors()
         self.open(base_url + '/fake_domain')
         self.assert_element("#message")
         self.assert_text("Uh Oh! Something is not quite right here, maybe you tried to access a page you do not have access to or one that has recently been deleted.", "#message")
@@ -850,6 +868,7 @@ class FrontEndHomePageTest(BaseCase):
     """""""""""""""
     " R6 BUY POST "
     """""""""""""""
+
 
     # R6.1.1  Confirm the ticket name only has alphanumeric characters
     @patch('qa327.backend.get_user', return_value=test_userR1)
@@ -965,7 +984,7 @@ class FrontEndHomePageTest(BaseCase):
         assert self.get_current_url() == base_url + '/?message=Not+asking+for+any+tickets'
         self.assert_element("#message")
         self.assert_text("Not asking for any tickets", "#message")
-
+    
     # R6.3.2 Confirm the ticket quantity to buy needs to be less than 100
     @patch('qa327.backend.get_user', return_value=test_userR1)
     def test_the_tickets_quantity_has_to_be_less_than_100(self, *_):
@@ -987,7 +1006,7 @@ class FrontEndHomePageTest(BaseCase):
         self.click('#buy-submit')
         assert self.get_current_url() == base_url + '/?message=We+cannot+supply+that+many+tickets+at+once'
         self.assert_element("#message")
-        self.assert_text( "We cannot supply that many tickets at once", "#message")
+        self.assert_text("We cannot supply that many tickets at once", "#message")
 
     # R6.4.1 Confirm what happens if the ticket does not exist
     @patch('qa327.backend.get_user', return_value=test_userR1)
@@ -1005,8 +1024,8 @@ class FrontEndHomePageTest(BaseCase):
         assert self.get_current_url() == base_url + '/'
         self.assert_element("#welcome-header")
         self.assert_text("Hi test frontend!", "#welcome-header")
-        self.type("#buy-name", "t2")
-        self.type("#buy-quantity", "50")
+        self.type("#buy-name", "random ticket doesnt exist")
+        self.type("#buy-quantity", "5")
         self.click('#buy-submit')
         assert self.get_current_url() == base_url + '/?message=No+tickets+with+that+name'
         self.assert_element("#message")
@@ -1025,16 +1044,16 @@ class FrontEndHomePageTest(BaseCase):
         # click the log in button
         self.click('input[type="submit"]')
         # validate that we are on the correct profile page
-        create_ticket("t1", 10, 10, "2020/08/03", "Shrey")
+        create_ticket("t1", 10, 10, "20210210", "Shrey")
         assert self.get_current_url() == base_url + '/'
         self.assert_element("#welcome-header")
         self.assert_text("Hi test frontend!", "#welcome-header")
         self.type("#buy-name", "t1")
         self.type("#buy-quantity", "40")
         self.click('#buy-submit')
-        assert self.get_current_url() == base_url + '/?message=Not+enough+tickets+available'
+        assert self.get_current_url() == base_url + '/?message=You+are+requesting+more+tickets+than+available+for+t1.+Please+change+your+requested+quantity.+'
         self.assert_element("#message")
-        self.assert_text("Not enough tickets available", "#message")
+        self.assert_text("You are requesting more tickets than available for t1. Please change your requested quantity.", "#message")
 
     # R6.5 Confirm what happens if the user does not have enough balance to pay for the tickets
     @patch('qa327.backend.get_user', return_value=test_userR4)
@@ -1050,11 +1069,11 @@ class FrontEndHomePageTest(BaseCase):
         self.click('input[type="submit"]')
         # validate that we are on the correct profile page
         assert self.get_current_url() == base_url + '/'
-        create_ticket("t2", 10000000, 100000000, "2020/08/03", "Shrey")
+        create_ticket("t2", 100, 100, "20210210", "Shrey")
         self.assert_element("#welcome-header")
         self.assert_text("Hi test frontend!", "#welcome-header")
         self.type("#buy-name", "t2")
-        self.type("#buy-quantity", "10")
+        self.type("#buy-quantity", "50")
         self.click('#buy-submit')
         assert self.get_current_url() == base_url + '/?message=Not+enough+user+balance'
         self.assert_element("#message")
@@ -1074,11 +1093,11 @@ class FrontEndHomePageTest(BaseCase):
         self.click('input[type="submit"]')
         # validate that we are on the correct profile page
         assert self.get_current_url() == base_url + '/'
-        create_ticket("t3", 1000, 10, "2020/08/03", "Shrey")
+        create_ticket("t3", 100, 10, "20210210", "Shrey")
         self.assert_element("#welcome-header")
         self.assert_text("Hi test frontend!", "#welcome-header")
         self.type("#buy-name", "t3")
-        self.type("#buy-quantity", "40")
+        self.type("#buy-quantity", "1")
         self.click('#buy-submit')
         assert self.get_current_url() == base_url + '/?message=Ticket+successfully+bought'
         self.assert_element("#message")
@@ -1096,7 +1115,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Lia Ticket")
         self.type("#sell-quantity", "50")
         self.type("#sell-price", "75")
-        self.type("#sell-expiry", "2020/02/10")
+        self.type("#sell-expiry", "20210210")
         self.click('input[id="sell-submit"]')
         self.type("#update-get-ticket", "Lia Ticket")
         self.type("#update-name", "LiasNewTicketName")
@@ -1116,7 +1135,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Lia Ticket")
         self.type("#sell-quantity", "50")
         self.type("#sell-price", "75")
-        self.type("#sell-expiry", "2020/02/10")
+        self.type("#sell-expiry", "20210210")
         self.click('input[id="sell-submit"]')
         self.type("#update-get-ticket", "Lia Ticket")
         self.type("#update-name", "Lia'sNewTicketName")
@@ -1136,7 +1155,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Lia Ticket")
         self.type("#sell-quantity", "50")
         self.type("#sell-price", "75")
-        self.type("#sell-expiry", "2020/02/10")
+        self.type("#sell-expiry", "20210210")
         self.click('input[id="sell-submit"]')
         self.type("#update-get-ticket", "Lia Ticket")
         self.type("#update-name", "Lias New Ticket Name")
@@ -1156,7 +1175,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Lia Ticket")
         self.type("#sell-quantity", "50")
         self.type("#sell-price", "75")
-        self.type("#sell-expiry", "2020/02/10")
+        self.type("#sell-expiry", "20210210")
         self.click('input[id="sell-submit"]')
         self.type("#update-get-ticket", "Lia Ticket")
         self.type("#update-name", " Lias New Ticket Name")
@@ -1176,7 +1195,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Lia Ticket")
         self.type("#sell-quantity", "50")
         self.type("#sell-price", "75")
-        self.type("#sell-expiry", "2020/02/10")
+        self.type("#sell-expiry", "20210210")
         self.click('input[id="sell-submit"]')
         self.type("#update-get-ticket", "Lia Ticket")
         self.type("#update-name", "Lias New Ticket Name ")
@@ -1196,7 +1215,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Lia Ticket")
         self.type("#sell-quantity", "50")
         self.type("#sell-price", "75")
-        self.type("#sell-expiry", "2020/02/10")
+        self.type("#sell-expiry", "20210210")
         self.click('input[id="sell-submit"]')
         self.type("#update-get-ticket", "Lia Ticket")
         self.type("#update-name", "Lias New Ticket Name6969696969696969696969696969696969696969")
@@ -1216,7 +1235,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Lia Ticket")
         self.type("#sell-quantity", "50")
         self.type("#sell-price", "75")
-        self.type("#sell-expiry", "2020/02/10")
+        self.type("#sell-expiry", "20210210")
         self.click('input[id="sell-submit"]')
         self.type("#update-get-ticket", "Lia Ticket")
         self.type("#update-name", "Lias New Ticket Name69696969696969696969696969696969696969")
@@ -1236,7 +1255,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Lia Ticket")
         self.type("#sell-quantity", "50")
         self.type("#sell-price", "75")
-        self.type("#sell-expiry", "2020/02/10")
+        self.type("#sell-expiry", "20210210")
         self.click('input[id="sell-submit"]')
         self.type("#update-get-ticket", "Lia Ticket")
         self.type("#update-name", "Lias New Ticket Name696969696969696969696969696969696969696969")
@@ -1256,7 +1275,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Lia Ticket")
         self.type("#sell-quantity", "50")
         self.type("#sell-price", "75")
-        self.type("#sell-expiry", "2020/02/10")
+        self.type("#sell-expiry", "20210210")
         self.click('input[id="sell-submit"]')
         self.type("#update-get-ticket", "Lia Ticket")
         self.type("#update-quantity", "69")
@@ -1276,7 +1295,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Lia Ticket")
         self.type("#sell-quantity", "50")
         self.type("#sell-price", "75")
-        self.type("#sell-expiry", "2020/02/10")
+        self.type("#sell-expiry", "20210210")
         self.click('input[id="sell-submit"]')
         self.type("#update-get-ticket", "Lia Ticket")
         self.type("#update-quantity", "420")
@@ -1296,7 +1315,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Lia Ticket")
         self.type("#sell-quantity", "50")
         self.type("#sell-price", "75")
-        self.type("#sell-expiry", "2020/02/10")
+        self.type("#sell-expiry", "20210210")
         self.click('input[id="sell-submit"]')
         self.type("#update-get-ticket", "Lia Ticket")
         self.type("#update-quantity", "0")
@@ -1316,7 +1335,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Lia Ticket")
         self.type("#sell-quantity", "50")
         self.type("#sell-price", "75")
-        self.type("#sell-expiry", "2020/02/10")
+        self.type("#sell-expiry", "20210210")
         self.click('input[id="sell-submit"]')
         self.type("#update-get-ticket", "Lia Ticket")
         self.type("#update-quantity", "-500")
@@ -1336,7 +1355,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Lia Ticket")
         self.type("#sell-quantity", "50")
         self.type("#sell-price", "75")
-        self.type("#sell-expiry", "2020/02/10")
+        self.type("#sell-expiry", "20210210")
         self.click('input[id="sell-submit"]')
         self.type("#update-get-ticket", "Lia Ticket")
         self.type("#update-price", "69")
@@ -1356,7 +1375,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Lia Ticket")
         self.type("#sell-quantity", "50")
         self.type("#sell-price", "75")
-        self.type("#sell-expiry", "2020/02/10")
+        self.type("#sell-expiry", "20210210")
         self.click('input[id="sell-submit"]')
         self.type("#update-get-ticket", "Lia Ticket")
         self.type("#update-price", "5")
@@ -1376,7 +1395,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Lia Ticket")
         self.type("#sell-quantity", "50")
         self.type("#sell-price", "75")
-        self.type("#sell-expiry", "2020/02/10")
+        self.type("#sell-expiry", "20210210")
         self.click('input[id="sell-submit"]')
         self.type("#update-get-ticket", "Lia Ticket")
         self.type("#update-price", "420")
@@ -1396,10 +1415,10 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Lia Ticket")
         self.type("#sell-quantity", "50")
         self.type("#sell-price", "75")
-        self.type("#sell-expiry", "2020/02/10")
+        self.type("#sell-expiry", "20210210")
         self.click('input[id="sell-submit"]')
         self.type("#update-get-ticket", "Lia Ticket")
-        self.type("#update-expiry", "19980105")
+        self.type("#update-expiry", "20210215")
         self.click('input[id="update-submit"]')
         self.assert_element("#message")
         self.assert_text("Ticket successfully updated", "#message")
@@ -1416,13 +1435,13 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Lia Ticket")
         self.type("#sell-quantity", "50")
         self.type("#sell-price", "75")
-        self.type("#sell-expiry", "2020/02/10")
+        self.type("#sell-expiry", "20210210")
         self.click('input[id="sell-submit"]')
         self.type("#update-get-ticket", "Lia Ticket")
-        self.type("#update-expiry", "19982801")
+        self.type("#update-expiry", "02152020")
         self.click('input[id="update-submit"]')
         self.assert_element("#message")
-        self.assert_text("Error: Date must be given in the format YYYYMMDD", "#message")
+        self.assert_text("Expiry date must be given in the format YYYYMMDD", "#message")
 
     #R5.6.1	Check if the updating actions succeed if the ticket name is found in the database
     @patch('qa327.backend.get_user', return_value=test_userR3)
@@ -1436,13 +1455,13 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Lia Ticket")
         self.type("#sell-quantity", "50")
         self.type("#sell-price", "75")
-        self.type("#sell-expiry", "2020/02/10")
+        self.type("#sell-expiry", "20210210")
         self.click('input[id="sell-submit"]')
         self.type("#update-get-ticket", "Lia Ticket")
         self.type("#update-name", "Lias Brand New Ticket")
         self.type("#update-quantity", "42")
         self.type("#update-price", "50")
-        self.type("#update-expiry", "19980105")
+        self.type("#update-expiry", "20210215")
         self.click('input[id="update-submit"]')
         self.assert_element("#message")
         self.assert_text("Ticket successfully updated", "#message")
@@ -1459,7 +1478,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Lia Ticket")
         self.type("#sell-quantity", "50")
         self.type("#sell-price", "75")
-        self.type("#sell-expiry", "2020/02/10")
+        self.type("#sell-expiry", "20210210")
         self.click('input[id="sell-submit"]')
         self.type("#update-get-ticket", "Lias Fake Ticket")
         self.type("#update-name", "Lias Brand New Ticket")
@@ -1484,7 +1503,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "TestShow")
         self.type("#sell-quantity", "10")
         self.type("#sell-price", "25")
-        self.type("#sell-expiry", "2020/02/10")
+        self.type("#sell-expiry", "20210210")
         # click enter button
         self.click('input[id="sell-submit"]')
         self.assert_element("#message")
@@ -1506,7 +1525,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "TestShow:)")
         self.type("#sell-quantity", "10")
         self.type("#sell-price", "25")
-        self.type("#sell-expiry", "2020/02/10")
+        self.type("#sell-expiry", "20210210")
         # click enter button
         self.click('input[id="sell-submit"]')
         assert self.get_current_url() == base_url + '/sell'
@@ -1530,7 +1549,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Test Show")
         self.type("#sell-quantity", "10")
         self.type("#sell-price", "25")
-        self.type("#sell-expiry", "2020/02/10")
+        self.type("#sell-expiry", "20210210")
         # click enter button
         self.click('input[id="sell-submit"]')
         self.assert_element("#message")
@@ -1552,7 +1571,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", " TestShow")
         self.type("#sell-quantity", "10")
         self.type("#sell-price", "25")
-        self.type("#sell-expiry", "2020/02/10")
+        self.type("#sell-expiry", "20210210")
         # click enter button
         self.click('input[id="sell-submit"]')
         assert self.get_current_url() == base_url + '/sell'
@@ -1575,7 +1594,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "T")
         self.type("#sell-quantity", "10")
         self.type("#sell-price", "25")
-        self.type("#sell-expiry", "2020/02/10")
+        self.type("#sell-expiry", "20210210")
         # click enter button
         self.click('input[id="sell-submit"]')
         self.assert_element("#message")
@@ -1597,7 +1616,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Very long name that is more than 60 characters surely much longer")
         self.type("#sell-quantity", "10")
         self.type("#sell-price", "25")
-        self.type("#sell-expiry", "2020/02/10")
+        self.type("#sell-expiry", "20210210")
         # click enter button
         self.click('input[id="sell-submit"]')
         assert self.get_current_url() == base_url + '/sell'
@@ -1620,7 +1639,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Test")
         self.type("#sell-quantity", "10")
         self.type("#sell-price", "25")
-        self.type("#sell-expiry", "2020/02/10")
+        self.type("#sell-expiry", "20210210")
         # click enter button
         self.click('input[id="sell-submit"]')
         self.assert_element("#message")
@@ -1642,7 +1661,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Test")
         self.type("#sell-quantity", "105")
         self.type("#sell-price", "25")
-        self.type("#sell-expiry", "2020/02/10")
+        self.type("#sell-expiry", "20210210")
         # click enter button
         self.click('input[id="sell-submit"]')
         assert self.get_current_url() == base_url + '/sell'
@@ -1665,7 +1684,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Test")
         self.type("#sell-quantity", "0")
         self.type("#sell-price", "25")
-        self.type("#sell-expiry", "2020/02/10")
+        self.type("#sell-expiry", "20210210")
         # click enter button
         self.click('input[id="sell-submit"]')
         assert self.get_current_url() == base_url + '/sell'
@@ -1688,7 +1707,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Test")
         self.type("#sell-quantity", "-10")
         self.type("#sell-price", "25")
-        self.type("#sell-expiry", "2020/02/10")
+        self.type("#sell-expiry", "20210210")
         # click enter button
         self.click('input[id="sell-submit"]')
         assert self.get_current_url() == base_url + '/sell'
@@ -1711,7 +1730,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Test")
         self.type("#sell-quantity", "10")
         self.type("#sell-price", "10")
-        self.type("#sell-expiry", "2020/02/10")
+        self.type("#sell-expiry", "20210204")
         # click enter button
         self.click('input[id="sell-submit"]')
         self.assert_element("#message")
@@ -1733,7 +1752,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Test")
         self.type("#sell-quantity", "10")
         self.type("#sell-price", "9")
-        self.type("#sell-expiry", "2020/02/10")
+        self.type("#sell-expiry", "20210204")
         # click enter button
         self.click('input[id="sell-submit"]')
         assert self.get_current_url() == base_url + '/sell'
@@ -1756,7 +1775,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Test")
         self.type("#sell-quantity", "10")
         self.type("#sell-price", "101")
-        self.type("#sell-expiry", "2020/02/10")
+        self.type("#sell-expiry", "20210204")
         # click enter button
         self.click('input[id="sell-submit"]')
         assert self.get_current_url() == base_url + '/sell'
@@ -1779,7 +1798,7 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Testing")
         self.type("#sell-quantity", "10")
         self.type("#sell-price", "15")
-        self.type("#sell-expiry", "2020/02/10")
+        self.type("#sell-expiry", "20210204")
         # click enter button
         self.click('input[id="sell-submit"]')
         self.assert_element("#message")
@@ -1801,12 +1820,12 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Testing")
         self.type("#sell-quantity", "10")
         self.type("#sell-price", "15")
-        self.type("#sell-expiry", "10/02/2020")
+        self.type("#sell-expiry", "05152020")
         # click enter button
         self.click('input[id="sell-submit"]')
         assert self.get_current_url() == base_url + '/sell'
         self.assert_element("#message")
-        self.assert_text("Expiry date must be given in the format YYYY/MM/DD", "#message")
+        self.assert_text("Expiry date must be given in the format YYYYMMDD", "#message")
         self.open(base_url + '/logout')
 
     # R4.6.1 and R4.6.2 have been incorporated into all of the test cases above for R4, for clarity and efficiency
@@ -1826,11 +1845,12 @@ class FrontEndHomePageTest(BaseCase):
         self.type("#sell-name", "Good ticket")
         self.type("#sell-quantity", "10")
         self.type("#sell-price", "15")
-        self.type("#sell-expiry", "2020/02/10")
+        self.type("#sell-expiry", "20210204")
         # click enter button
         self.click('input[id="sell-submit"]')
         self.assert_element("#message")
         self.assert_text("Ticket successfully posted to sell", "#message")
         self.assert_element("#tickets")
-        self.assert_text("Good ticket 15.0 10 test_frontend@test.com 2020/02/10", "#tickets")
+        self.assert_text("Good ticket $15.0 10 test_frontend@test.com 20210204", "#tickets")
         self.open(base_url + '/logout')
+

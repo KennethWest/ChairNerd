@@ -1,7 +1,7 @@
-  
 from flask import render_template, request, session, redirect, url_for
 import re
 from datetime import datetime
+from datetime import date
 from qa327 import app
 import qa327.backend as bn
 from sqlalchemy import update
@@ -50,6 +50,7 @@ def authenticate(inner_function):
     # return the wrapped version of the inner_function:
     return wrapped_inner
 
+
 # R4:
 @app.route('/sell', methods=['POST'])
 def sell_post():
@@ -77,9 +78,18 @@ def sell_post():
         error_message = "The ticket price has to be between $10 and $100 (inclusive)"
     else:
         try:  # checking to see if the inputted expiry date is of proper format
-            expiry = datetime.strptime(expiry, "%Y/%m/%d").strftime('%Y/%m/%d')
+            expiry = datetime.strptime(expiry, "%Y%m%d").strftime('%Y%m%d')
         except ValueError as e:
-            error_message = "Expiry date must be given in the format YYYY/MM/DD"
+            error_message = "Expiry date must be given in the format YYYYMMDD"
+            return render_template('index.html', message=error_message, user=user, tickets=tickets)
+
+        try:  # checking to see if the inputted expiry date is expired
+            expiryTest = datetime.strptime(expiry, "%Y%m%d")
+            today = date.today()
+            if expiryTest.date() < today:
+                error_message = "Invalid: Inputted expiry date is already expired"
+        except ValueError as e:
+            error_message = "ERROR"
 
     if error_message:
         return render_template('index.html', message=error_message, user=user, tickets=tickets)
@@ -87,6 +97,7 @@ def sell_post():
         bn.create_ticket(name, quantity, price, expiry, email)
         tickets = bn.get_all_tickets()
         return render_template('index.html', message="Ticket successfully posted to sell", user=user, tickets=tickets)
+
 
 '''
 @app.route('/sell', methods=['GET'])
@@ -100,9 +111,11 @@ def buy_post():
     name = request.form.get('name')
     quantity = int(request.form.get('quantity'))
     error_message = None
+    message = None
     email = session['logged_in']
     user = bn.get_user(email)
     ticket = Tickets.query.filter(Tickets.name == name).first()
+
     # check to see that the name is alphanumeric only and there is no space that is the first or last character
     if len(name) > 60 or len(name) < 1 or name[0] == " " or name[-1] == " " or not (name.replace(" ", "").isalnum()):
         error_message = "Name format is incorrect"
@@ -112,25 +125,33 @@ def buy_post():
         error_message = "We cannot supply that many tickets at once"
     elif ticket is None:
         error_message = "No tickets with that name"
-    elif quantity > ticket.quantity:
-        error_message = "Not enough tickets available"
-    elif user.balance <= (ticket.price * quantity) + 0.35 * (ticket.price * quantity) + 0.05 * (ticket.price * quantity):
+    elif user.balance <= (ticket.price * quantity) + (0.35 * (ticket.price * quantity)) + (
+            0.05 * (ticket.price * quantity)):
         error_message = "Not enough user balance"
+    elif ticket.quantity < quantity:
+        error_message = "You are requesting more tickets than available for " + ticket.name + ". Please change your " \
+                                                                                              "requested quantity. "
     else:
-        # check name, then quantitiy, exists in the database is already done, so do this stuff first
-        newBalance = float(bn.get_user(email).balance) - (float(ticket.price) * quantity)
-        # if ticket.quantity <= quantity:
-        db.session.delete(ticket)
+        # calculate the total price, the new balance based on that price and the new user balance
+        totalPrice = (ticket.price * quantity) + (0.35 * (ticket.price * quantity)) + (0.05 * (ticket.price * quantity))
+        newBalance = float(bn.get_user(email).balance) - totalPrice
         user.balance = newBalance
-        db.session.commit()
+        # ticket deletes if the user requests the exact number of tickets available
+        if ticket.quantity == quantity:
+            db.session.delete(ticket)
         # tickets = bn.get_all_tickets()
         # return render_template('index.html', message=error_message, user=user, tickets=tickets, balance=newBalance)
-        quant = ticket.quantity - quantity
-        ticket.quantity = quant
-        user.balance = newBalance
+        # otherwise quantity is updated
+        else:
+            quant = ticket.quantity - quantity
+            ticket.quantity = quant
         db.session.commit()
-        error_message = "Ticket successfully bought"
-    return redirect(url_for('.profile', message=error_message))
+        message = "Ticket successfully bought"
+
+    if error_message is not None:
+        return redirect(url_for('.profile', message=error_message))
+    else:
+        return redirect(url_for('.profile', message=message))
 
 
 @app.route('/update', methods=['POST'])
@@ -198,38 +219,21 @@ def update_post():
 
     # check expiry date of ticket
     if (expiry != ''):
-        expiry_valid = True
-        try:
-            # check for any non int characters
-            expiry_year = int(expiry[0:4])
-            expiry_month = int(expiry[4:6])
-            expiry_day = int(expiry[6:8])
-            # check length
-            if len(expiry) != 8:
-                expiry_valid = False
-            # check for valid month
-            if 1 > expiry_month or expiry_month > 12:
-                expiry_valid = False
-            else:
-                # check for valid day
-                if expiry_month in [1, 3, 5, 7, 8, 10, 12]:  # if month is 31 days long
-                    if 1 > expiry_day or expiry_day > 31:
-                        expiry_valid = False
-                elif expiry_month == 2: # if month is Feburary
-                    if 1 > expiry_day or expiry_day > 29: # assuming not leap year
-                        expiry_valid = False
-                else: # if the month is 30 days long
-                    if 1 > expiry_day or expiry_day > 31:
-                        expiry_valid = False
 
-            # return the error if there was any
-            if not expiry_valid:
-                error_message = 'Error: Date must be given in the format YYYYMMDD'
-                return render_template('index.html', message=error_message, user=user, tickets=tickets)
-
-        except:
-            error_message = 'Error: Date must be given in the format YYYYMMDD'
+        try:  # checking to see if the inputted expiry date is of proper format
+            expiry = datetime.strptime(expiry, "%Y%m%d").strftime('%Y%m%d')
+        except ValueError as e:
+            error_message = "Expiry date must be given in the format YYYYMMDD"
             return render_template('index.html', message=error_message, user=user, tickets=tickets)
+
+        try:  # checking to see if the inputted expiry date is already expired
+            expiryTest = datetime.strptime(expiry, "%Y%m%d")
+            today = date.today()
+            if expiryTest.date() < today:
+                error_message = "Invalid: Inputted expiry date is already expired"
+                return render_template('index.html', message=error_message, user=user, tickets=tickets)
+        except ValueError as e:
+            error_message = "ERROR"
 
     # check for special characters in the ticket name
     if (newName != ''):
@@ -239,7 +243,7 @@ def update_post():
             if not char.isalnum():
                 error_message = 'Error: The name of the ticket must be alphanumeric only'
                 return render_template('index.html', message=error_message, user=user, tickets=tickets)
-    
+
     if (newName != ''):
         userTicket.name = newName
     if (quantity != ''):
@@ -249,8 +253,9 @@ def update_post():
     if (expiry != ''):
         userTicket.expiry = expiry
     db.session.commit()
-    error_message = "Ticket successfully updated"
-    return render_template('index.html', message=error_message, user=user, tickets=tickets)
+    message = "Ticket successfully updated"
+    return render_template('index.html', message=message, user=user, tickets=tickets)
+
 
 @app.route('/register', methods=['POST'])
 def register_post():
@@ -267,15 +272,18 @@ def register_post():
         error_message = "Email format is incorrect"
 
     elif not re.search("^(?=.*[a-z])(?=.*[A-Z])(?=.*[@$!%*#?&])[A-Za-z\d@$!#%*?&]{6,}$", password):
-        error_message = "Password not strong enough"
+        error_message = "Password not strong enough - must have minimum length 6, at least one upper case, at least " \
+                        "one lower case, and at least one special character"
 
-    elif len(name) > 20 or len(name) < 3 or name[0] == " " or name[-1] == " " or not (name.replace(" ", "").isalnum()):
-        error_message = "Name format is incorrect."
+    elif len(name) >= 20 or len(name) < 3 or name[0] == " " or name[-1] == " " or not (name.replace(" ", "").isalnum()):
+        error_message = "Name format is incorrect. User name has to be non-empty, longer than 2 characters and less " \
+                        "than 20 characters, alphanumeric-only, and space allowed only if it is not the first or the " \
+                        "last character"
 
     else:
         user = bn.get_user(email)
         if user:
-            error_message = "this email has been ALREADY used"
+            error_message = "This email has been ALREADY used"
         else:
             a = bn.register_user(email, name, password)
             if not a:
@@ -334,9 +342,11 @@ def login_post():
         Here we store the user object into the session, so we can tell
         if the client has already login in the following sessions.
         """
-        # success! go back to the home page
-        # code 303 is to force a 'GET' request
+        tickets = bn.get_all_tickets()
+
+
         return redirect('/', code=303)
+        ##return render_template('index.html', user=user, tickets=tickets)
     else:
         return render_template('login.html', message='email/password combination incorrect')
 
@@ -347,12 +357,14 @@ def logout():
         session.pop('logged_in', None)
     return redirect('/')
 
+
 @app.route('/register', methods=['GET'])
 @authenticate
 def register_get(user):
     if user:
         return redirect('/')
     return render_template('register.html', message='')
+
 
 @app.route('/')
 @authenticate
@@ -368,6 +380,7 @@ def profile(user):
     except:
         message = ""
     return render_template('index.html', user=user, tickets=tickets, message=message)
+
 
 @app.errorhandler(404)
 def not_found_404(error):
